@@ -395,4 +395,5 @@
         function importData(e) { const r = new FileReader(); r.onload = ev => { try { db = JSON.parse(ev.target.result); refresh(); alert("تم استيراد البيانات بنجاح ✅"); } catch(err) { alert("خطأ في ملف الاستيراد"); } }; r.readAsText(e.target.files[0]); }
     </script>
 </body>
+
 </html>

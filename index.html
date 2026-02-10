@@ -158,7 +158,7 @@
                 <div id="persons-container"></div>
                 <button onclick="addPerson()" style="width:100%; border:1px solid #ddd; padding:8px; border-radius:10px; margin-bottom:15px; font-size:12px; background:none;">+ إضافة مسؤول</button>
 
-                <label><svg class="label-icon" viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 1 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg> ملخص الزيارة</label>
+                <label><svg class="label-icon" viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121(o 1 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg> ملخص الزيارة</label>
                 <textarea id="v-note" class="input" rows="3"></textarea>
                 
                 <input type="hidden" id="v-location">
@@ -176,6 +176,29 @@
             </div>
             <input type="text" id="comp-search" class="input" placeholder="بحث باسم الشركة أو المنطقة..." oninput="renderComps()">
             <div id="company-list"></div>
+        </div>
+    </div>
+
+    <div id="edit-full-modal" onclick="closeEditFullModal()" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.6); z-index:5000; padding:15px; align-items:center; justify-content:center;">
+        <div class="card" style="width:100%; max-width:450px; max-height:90vh; overflow-y:auto;" onclick="event.stopPropagation()">
+            <h3 style="color:var(--navy); margin-top:0;">تعديل شامل للبيانات</h3>
+            <input type="hidden" id="edit-original-name">
+            
+            <label>اسم الشركة</label>
+            <input type="text" id="edit-name" class="input">
+            
+            <label>المنطقة</label>
+            <select id="edit-zone" class="input"></select>
+            
+            <label>المسؤولين</label>
+            <div id="edit-persons-container"></div>
+            <button onclick="addPersonToEdit()" style="width:100%; border:1px solid #ddd; padding:8px; border-radius:10px; margin-bottom:15px; font-size:11px;">+ إضافة مسؤول</button>
+
+            <label>سجل الملاحظات (أحدث زيارة)</label>
+            <textarea id="edit-last-note" class="input" rows="3"></textarea>
+
+            <button class="btn-neon" onclick="saveFullEdit()">حفظ التغييرات</button>
+            <button onclick="closeEditFullModal()" style="width:100%; background:#666; color:white; border:none; padding:12px; border-radius:14px; margin-top:8px; font-weight:bold;">إلغاء</button>
         </div>
     </div>
 
@@ -206,11 +229,11 @@
     </nav>
 
     <script>
-        // داتابيز التطبيق
         let db = JSON.parse(localStorage.getItem('PHYSIO_V35')) || { 
             user: "", visits: [], companies: [], zones: ["المعادي", "الدقي", "مدينة نصر", "المقطم", "حلوان", "العبور"]
         };
         let viewM = new Date(), selD = new Date().toDateString();
+        let pressTimer;
 
         window.onload = function() { 
             if (!db.user) document.getElementById('login-screen').style.display = 'flex'; 
@@ -219,7 +242,6 @@
         };
 
         function firstTimeLogin() { const u = document.getElementById('user-input').value.trim(); if(u){ db.user=u; refresh(); runSplash(); } }
-        
         function runSplash() { 
             document.getElementById('login-screen').style.display = 'none'; 
             const s = document.getElementById('splash-screen'); 
@@ -227,20 +249,15 @@
             s.style.display = 'flex'; 
             setTimeout(() => { s.style.opacity = '0'; s.style.transition = '0.5s'; setTimeout(() => { s.style.display = 'none'; start(); }, 500); }, 2000); 
         }
-
-        function start() { 
-            document.getElementById('app-header').style.display='grid'; 
-            document.getElementById('app-content').style.display='block'; 
-            document.getElementById('app-nav').style.display='flex'; 
-            document.getElementById('user-display').innerText = db.user; 
-            refresh(); 
-        }
+        function start() { document.getElementById('app-header').style.display='grid'; document.getElementById('app-content').style.display='block'; document.getElementById('app-nav').style.display='flex'; document.getElementById('user-display').innerText = db.user; refresh(); }
 
         function refresh() { 
             localStorage.setItem('PHYSIO_V35', JSON.stringify(db)); 
             renderCal(); renderVisits(); renderComps(); renderHubStats();
-            document.getElementById('comp-zone').innerHTML = db.zones.map(z => `<option>${z}</option>`).join('') + `<option value="NEW">+ منطقة جديدة</option>`; 
-            document.getElementById('comp-dl').innerHTML = db.companies.map(c => `<option value="${c.name}">`).join(''); 
+            const zOpts = db.zones.map(z=>`<option>${z}</option>`).join('') + `<option value="NEW">+ منطقة جديدة</option>`;
+            document.getElementById('comp-zone').innerHTML = zOpts; 
+            document.getElementById('edit-zone').innerHTML = db.zones.map(z=>`<option>${z}</option>`).join('');
+            document.getElementById('comp-dl').innerHTML = db.companies.map(c=>`<option value="${c.name}">`).join(''); 
         }
 
         function renderHubStats() {
@@ -262,15 +279,7 @@
             document.getElementById('top-zones').innerHTML = sorted.map(z => `<div class="tag-item">${z[0]} (${z[1]})</div>`).join('') || '<small>لا بيانات كافية</small>';
         }
 
-        function getLocation() { 
-            const s = document.getElementById('gps-status'); 
-            if (navigator.geolocation) { 
-                navigator.geolocation.getCurrentPosition((pos) => { 
-                    document.getElementById('v-location').value = `https://www.google.com/maps?q=${pos.coords.latitude},${pos.coords.longitude}`; 
-                    s.innerText = "تم تحديد الموقع بنجاح ✅"; 
-                }, () => { s.innerText = "تعذر جلب الموقع."; }); 
-            } 
-        }
+        function getLocation() { const s = document.getElementById('gps-status'); if (navigator.geolocation) { navigator.geolocation.getCurrentPosition((pos) => { document.getElementById('v-location').value = `https://www.google.com/maps?q=${pos.coords.latitude},${pos.coords.longitude}`; s.innerText = "تم تحديد الموقع بنجاح ✅"; }, () => { s.innerText = "تعذر جلب الموقع."; }); } }
         
         function saveVisit() {
             const name = document.getElementById('comp-name').value.trim();
@@ -290,27 +299,123 @@
             
             db.visits.push({ company: name, note, date: selD, timestamp: new Date().toLocaleTimeString('ar-EG') });
             
-            document.getElementById('comp-name').value=''; 
-            document.getElementById('v-note').value=''; 
-            document.getElementById('persons-container').innerHTML = ''; 
-            addPerson();
-            refresh(); 
-            tab('p-home', document.querySelectorAll('.nav-link')[0]); 
+            document.getElementById('comp-name').value=''; document.getElementById('v-note').value=''; 
+            document.getElementById('persons-container').innerHTML = ''; addPerson();
+            refresh(); tab('p-home', document.querySelectorAll('.nav-link')[0]); 
         }
 
-        function generatePDF(data, fileName) {
-            document.getElementById('pdf-user-info').innerText = `الموظف: ${db.user}`;
-            document.getElementById('pdf-date-info').innerText = `الفترة: ${fileName.replace(/_/g, ' ')}`;
-            let rows = "";
-            data.forEach(v => {
-                const c = db.companies.find(co => co.name === v.company) || {};
-                const p = c.persons && c.persons[0] ? c.persons[0].name : '-';
-                rows += `<tr><td style="padding:10px;">${v.company}</td><td>${c.zone || '-'}</td><td>${p}</td><td>${v.note}</td><td>${v.timestamp || ''}</td></tr>`;
+        function renderComps() { 
+            const s = document.getElementById('comp-search').value.toLowerCase(); 
+            const f = db.companies.filter(c => c.name.toLowerCase().includes(s) || c.zone.toLowerCase().includes(s)); 
+            document.getElementById('company-list').innerHTML = f.map(c => `
+                <div class="card" 
+                     style="display:flex; justify-content:space-between; align-items:center;"
+                     onmousedown="startLongPress('${c.name.replace(/'/g, "\\'")}')" 
+                     onmouseup="endLongPress('${c.name.replace(/'/g, "\\'")}')" 
+                     ontouchstart="startLongPress('${c.name.replace(/'/g, "\\'")}')" 
+                     ontouchend="endLongPress('${c.name.replace(/'/g, "\\'")}')">
+                    <div><b>${c.name}</b><br><small>📍 ${c.zone}</small></div>
+                    <svg style="width:14px; color:var(--teal);" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M15 18l-6-6 6-6" /></svg>
+                </div>`).join(''); 
+        }
+
+        // منطق الضغط المطول للتعديل
+        function startLongPress(name) { pressTimer = setTimeout(() => { openFullEdit(name); pressTimer = null; }, 800); }
+        function endLongPress(name) { if(pressTimer) { clearTimeout(pressTimer); pressTimer = null; showCompDetails(name); } }
+
+        function openFullEdit(name) {
+            const c = db.companies.find(co => co.name === name);
+            if(!c) return;
+            document.getElementById('edit-original-name').value = c.name;
+            document.getElementById('edit-name').value = c.name;
+            document.getElementById('edit-zone').value = c.zone;
+            
+            const cont = document.getElementById('edit-persons-container');
+            cont.innerHTML = '';
+            (c.persons || []).forEach(p => addPersonToEdit(p));
+            
+            const vs = db.visits.filter(v => v.company === name);
+            document.getElementById('edit-last-note').value = vs.length ? vs[vs.length-1].note : "";
+            
+            document.getElementById('edit-full-modal').style.display = 'flex';
+        }
+
+        function addPersonToEdit(data = null) {
+            const div = document.createElement('div'); div.style.display="flex"; div.style.gap="5px"; div.style.marginBottom="8px";
+            div.innerHTML = `
+                <select class="input ep-title" style="width:85px;">
+                    <option ${data?.title==='دكتور'?'selected':''}>دكتور</option>
+                    <option ${data?.title==='أستاذ'?'selected':''}>أستاذ</option>
+                    <option ${data?.title==='أستاذة'?'selected':''}>أستاذة</option>
+                </select>
+                <input type="text" class="input ep-name" placeholder="الاسم" style="flex:1;" value="${data?.name||''}">
+                <input type="tel" class="input ep-phone" placeholder="الموبايل" style="flex:1;" value="${data?.phone||''}">
+            `;
+            document.getElementById('edit-persons-container').appendChild(div);
+        }
+
+        function saveFullEdit() {
+            const oldN = document.getElementById('edit-original-name').value;
+            const newN = document.getElementById('edit-name').value.trim();
+            const newZ = document.getElementById('edit-zone').value;
+            
+            if(!newN) return alert("الاسم مطلوب");
+            
+            let pList = [];
+            document.querySelectorAll('#edit-persons-container > div').forEach(d => {
+                const n = d.querySelector('.ep-name').value.trim();
+                if(n) pList.push({ title: d.querySelector('.ep-title').value, name: n, phone: d.querySelector('.ep-phone').value });
             });
-            document.getElementById('pdf-body').innerHTML = rows;
-            const el = document.getElementById('pdf-template');
-            el.style.display = 'block';
-            html2pdf().from(el).set({ margin: 10, filename: `${fileName}.pdf`, image: { type: 'jpeg', quality: 0.98 } }).save().then(() => el.style.display = 'none');
+
+            const cIdx = db.companies.findIndex(c => c.name === oldN);
+            if(cIdx !== -1) {
+                db.companies[cIdx].name = newN;
+                db.companies[cIdx].zone = newZ;
+                db.companies[cIdx].persons = pList;
+                
+                db.visits.forEach(v => {
+                    if(v.company === oldN) {
+                        v.company = newN;
+                        if(v === db.visits.filter(x => x.company === newN).pop()) v.note = document.getElementById('edit-last-note').value;
+                    }
+                });
+                refresh();
+                closeEditFullModal();
+            }
+        }
+
+        function closeEditFullModal() { document.getElementById('edit-full-modal').style.display = 'none'; }
+
+        function renderCal() { 
+            const grid = document.getElementById('calendar'); grid.innerHTML = ''; 
+            const y = viewM.getFullYear(), m = viewM.getMonth(); 
+            document.getElementById('month-label').innerText = viewM.toLocaleDateString('ar-EG', {month:'long', year:'numeric'}); 
+            const first = new Date(y, m, 1).getDay(); const days = new Date(y, m+1, 0).getDate(); 
+            for(let i=0; i<first; i++) grid.innerHTML += '<div></div>'; 
+            for(let d=1; d<=days; d++) { 
+                let dStr = new Date(y, m, d).toDateString(); 
+                grid.innerHTML += `<div class="day ${dStr === selD ? 'selected' : ''} ${db.visits.some(v=>v.date===dStr)?'has-v':''}" onclick="selD='${dStr}'; refresh();">${d}</div>`; 
+            } 
+        }
+
+        function renderVisits() { const f = db.visits.filter(v => v.date === selD); document.getElementById('daily-visits').innerHTML = f.map(v => `<div class="card" style="border-right:5px solid var(--teal)"><b>${v.company}</b><br><small>${v.note}</small></div>`).join('') || '<p style="text-align:center; opacity:0.5;">لا زيارات اليوم</p>'; }
+        
+        function showCompDetails(name) { 
+            const c = db.companies.find(co => co.name === name); 
+            const vs = db.visits.filter(v => v.company === name); 
+            document.getElementById('modal-title').innerText = c.name; 
+            let h = `<p><b>المنطقة:</b> ${c.zone}</p>`; 
+            if(c.location) h += `<p><b>العنوان:</b> <a href="${c.location}" target="_blank" style="color:var(--teal);">فتح الخريطة 📍</a></p>`; 
+            h += `<hr><h4>المسؤولين:</h4>`; (c.persons||[]).forEach(p => h += `<p>• ${p.title}/ ${p.name} (${p.phone})</p>`); 
+            h += `<hr><h4>سجل الزيارات:</h4>`; vs.forEach(v => h += `<p style="font-size:12px; border-bottom:1px solid #eee; padding:5px 0;">📅 ${v.date}: ${v.note}</p>`); 
+            document.getElementById('modal-content').innerHTML = h; 
+            document.getElementById('details-modal').style.display = 'flex'; 
+        }
+        
+        function addPerson() { 
+            const div = document.createElement('div'); div.style.display = "flex"; div.style.gap = "5px"; div.style.marginBottom = "8px"; 
+            div.innerHTML = `<select class="input p-title" style="width:90px;"><option>دكتور</option><option>أستاذ</option><option>أستاذة</option></select><input type="text" class="input p-name" placeholder="الاسم" style="flex:1;"><input type="tel" class="input p-phone" placeholder="الموبايل" style="flex:1;">`; 
+            document.getElementById('persons-container').appendChild(div); 
         }
 
         function downloadMonthlyPDF() {
@@ -328,6 +433,21 @@
             generatePDF(vT, `تقرير_يوم_${selD}`);
         }
 
+        function generatePDF(data, fileName) {
+            document.getElementById('pdf-user-info').innerText = `الموظف: ${db.user}`;
+            document.getElementById('pdf-date-info').innerText = `الفترة: ${fileName.replace(/_/g, ' ')}`;
+            let rows = "";
+            data.forEach(v => {
+                const c = db.companies.find(co => co.name === v.company) || {};
+                const p = c.persons && c.persons[0] ? c.persons[0].name : '-';
+                rows += `<tr><td style="padding:10px;">${v.company}</td><td>${c.zone || '-'}</td><td>${p}</td><td>${v.note}</td><td>${v.timestamp || ''}</td></tr>`;
+            });
+            document.getElementById('pdf-body').innerHTML = rows;
+            const el = document.getElementById('pdf-template');
+            el.style.display = 'block';
+            html2pdf().from(el).set({ margin: 10, filename: `${fileName}.pdf`, image: { type: 'jpeg', quality: 0.98 } }).save().then(() => el.style.display = 'none');
+        }
+
         function shareWA() {
             const f = db.visits.filter(v => v.date === selD);
             if(!f.length) return alert("لا توجد زيارات");
@@ -339,56 +459,10 @@
             window.open(`https://wa.me/?text=${fullMsg}`);
         }
 
-        function renderCal() { 
-            const grid = document.getElementById('calendar'); grid.innerHTML = ''; 
-            const y = viewM.getFullYear(), m = viewM.getMonth(); 
-            document.getElementById('month-label').innerText = viewM.toLocaleDateString('ar-EG', {month:'long', year:'numeric'}); 
-            const first = new Date(y, m, 1).getDay(); const days = new Date(y, m+1, 0).getDate(); 
-            for(let i=0; i<first; i++) grid.innerHTML += '<div></div>'; 
-            for(let d=1; d<=days; d++) { 
-                let dStr = new Date(y, m, d).toDateString(); 
-                grid.innerHTML += `<div class="day ${dStr === selD ? 'selected' : ''} ${db.visits.some(v=>v.date===dStr)?'has-v':''}" onclick="selD='${dStr}'; refresh();">${d}</div>`; 
-            } 
-        }
-
-        function renderVisits() { 
-            const f = db.visits.filter(v => v.date === selD); 
-            document.getElementById('daily-visits').innerHTML = f.map(v => `<div class="card" style="border-right:5px solid var(--teal)"><b>${v.company}</b><br><small>${v.note}</small></div>`).join('') || '<p style="text-align:center; opacity:0.5;">لا زيارات اليوم</p>'; 
-        }
-
-        function renderComps() { 
-            const s = document.getElementById('comp-search').value.toLowerCase(); 
-            const f = db.companies.filter(c => c.name.toLowerCase().includes(s) || c.zone.toLowerCase().includes(s)); 
-            document.getElementById('company-list').innerHTML = f.map(c => `<div class="card" onclick="showCompDetails('${c.name.replace(/'/g, "\\'")}')" style="display:flex; justify-content:space-between; align-items:center;"><div><b>${c.name}</b><br><small>📍 ${c.zone}</small></div><svg style="width:14px; color:var(--teal);" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M15 18l-6-6 6-6" /></svg></div>`).join(''); 
-        }
-
-        function showCompDetails(name) { 
-            const c = db.companies.find(co => co.name === name); 
-            const vs = db.visits.filter(v => v.company === name); 
-            document.getElementById('modal-title').innerText = c.name; 
-            let h = `<p><b>المنطقة:</b> ${c.zone}</p>`; 
-            if(c.location) h += `<p><b>العنوان:</b> <a href="${c.location}" target="_blank" style="color:var(--teal);">فتح الخريطة 📍</a></p>`; 
-            h += `<hr><h4>المسؤولين:</h4>`; (c.persons||[]).forEach(p => h += `<p>• ${p.title}/ ${p.name} (${p.phone})</p>`); 
-            h += `<hr><h4>سجل الزيارات:</h4>`; vs.forEach(v => h += `<p style="font-size:12px; border-bottom:1px solid #eee; padding:5px 0;">📅 ${v.date}: ${v.note}</p>`); 
-            document.getElementById('modal-content').innerHTML = h; 
-            document.getElementById('details-modal').style.display = 'flex'; 
-        }
-        
-        function addPerson() { 
-            const div = document.createElement('div'); div.style.display = "flex"; div.style.gap = "5px"; div.style.marginBottom = "8px"; 
-            div.innerHTML = `<select class="input p-title" style="width:90px;"><option>دكتور</option><option>أستاذ</option></select><input type="text" class="input p-name" placeholder="الاسم" style="flex:1;"><input type="tel" class="input p-phone" placeholder="الموبايل" style="flex:1;">`; 
-            document.getElementById('persons-container').appendChild(div); 
-        }
-
         function toggleHub(show) { document.getElementById('employee-hub').style.display = show ? 'flex' : 'none'; }
         function closeModal() { document.getElementById('details-modal').style.display = 'none'; }
         function moveMonth(n) { viewM.setMonth(viewM.getMonth()+n); refresh(); }
-        function tab(id, el) { 
-            document.querySelectorAll('.page').forEach(p => p.classList.remove('active')); 
-            document.getElementById(id).classList.add('active'); 
-            document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active')); 
-            el.classList.add('active'); 
-        }
+        function tab(id, el) { document.querySelectorAll('.page').forEach(p => p.classList.remove('active')); document.getElementById(id).classList.add('active'); document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active')); el.classList.add('active'); }
         function checkNewZone(sel) { if(sel.value === "NEW") { const n = prompt("اسم المنطقة الجديدة:"); if(n) { db.zones.push(n); refresh(); sel.value = n; } else sel.selectedIndex = 0; } }
         function toggleDrop() { document.getElementById("reportDrop").classList.toggle("show"); }
         function exportData() { const blob = new Blob([JSON.stringify(db)], {type:"application/json"}); const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = `Physio_Backup_${new Date().toLocaleDateString()}.json`; a.click(); }

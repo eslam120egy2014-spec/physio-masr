@@ -3,9 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Physio Masr Elite V35 - Stable</title>
+    <title>Physio Masr Elite V44 - Smooth Scroll</title>
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;900&display=swap" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <!-- SortableJS for drag and drop -->
+    <script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>
     <style>
         :root { --navy: #023652; --teal: #1cb5b5; --bg: #f4f7f9; --card: #ffffff; --border: #e2e8f0; --neon-glow: 0 0 15px rgba(28, 181, 181, 0.6); --red: #ff4757; }
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; outline: none; }
@@ -50,11 +52,19 @@
         .nav-link.active { color: var(--teal); }
 
         .btn-neon { background: var(--teal); color: white; border: none; padding: 16px; border-radius: 14px; font-weight: 900; width: 100%; box-shadow: var(--neon-glow); margin-top: 10px; cursor: pointer; }
+        .btn-small { background: var(--teal); color: white; border: none; padding: 5px 10px; border-radius: 8px; font-size: 12px; font-weight: bold; cursor: pointer; }
         
         #employee-hub { position: fixed; inset: 0; background: var(--bg); z-index: 4000; display: none; flex-direction: column; animation: slideUp 0.4s ease-out; }
         @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
         .hub-header { background: var(--navy); padding: 15px; color: white; border-bottom: 3px solid var(--teal); }
         .hub-content { padding: 15px; overflow-y: auto; flex: 1; }
+
+        /* تنسيق تبويبات الهب */
+        .hub-tabs { display: flex; gap: 10px; margin-bottom: 15px; border-bottom: 1px solid var(--border); padding-bottom: 10px; }
+        .hub-tab { padding: 8px 16px; background: #eee; border-radius: 20px; font-size: 14px; font-weight: bold; cursor: pointer; }
+        .hub-tab.active { background: var(--teal); color: white; }
+        .hub-tab-content { display: none; }
+        .hub-tab-content.active { display: block; }
 
         .stat-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 20px; }
         .stat-box { background: white; padding: 15px; border-radius: 18px; border: 1px solid var(--border); text-align: center; }
@@ -65,6 +75,36 @@
         .progress-bar { background: var(--teal); height: 100%; width: 0%; transition: 1.5s cubic-bezier(0.4, 0, 0.2, 1); }
         .tag-list { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
         .tag-item { background: var(--navy); color: white; padding: 6px 12px; border-radius: 10px; font-size: 11px; font-weight: bold; }
+
+        /* Checkbox group styles */
+        .days-checkbox-group { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 15px; background: #f9f9f9; padding: 10px; border-radius: 12px; }
+        .days-checkbox-group label { display: inline-flex; align-items: center; gap: 5px; font-size: 13px; font-weight: normal; margin-bottom: 0; cursor: pointer; }
+        .planned-day-badge { background: var(--teal); color: white; padding: 2px 8px; border-radius: 12px; font-size: 10px; font-weight: bold; margin-left: 5px; }
+        .company-item { cursor: pointer; transition: 0.2s; touch-action: pan-y; user-select: none; -webkit-tap-highlight-color: transparent; }
+        .company-item:active { background: #f0f0f0; }
+
+        /* تنسيقات صفحة التحكم داخل الهب */
+        .admin-day-tab { padding: 8px 12px; background: #eee; border-radius: 20px; font-size: 12px; font-weight: bold; cursor: pointer; white-space: nowrap; }
+        .admin-day-tab.active { background: var(--teal); color: white; }
+        .plan-company-row { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; background: white; padding: 10px; border-radius: 12px; border: 1px solid var(--border); cursor: grab; }
+        .plan-company-row:active { cursor: grabbing; }
+        .plan-company-info { flex: 1; cursor: pointer; }
+        .delete-btn { background: var(--red); color: white; border: none; padding: 5px 12px; border-radius: 20px; font-size: 12px; font-weight: bold; cursor: pointer; }
+        .drag-handle { font-size: 20px; color: #aaa; margin-left: 5px; }
+
+        /* تحسين التمرير في صفحة البيانات */
+        .company-list-scroll { max-height: 70vh; overflow-y: auto; padding-left: 5px; -webkit-overflow-scrolling: touch; }
+
+        /* تنسيق قائمة الاختيار المتعدد في التحكم */
+        .multi-select-list { max-height: 250px; overflow-y: auto; border: 1px solid var(--border); border-radius: 12px; padding: 10px; margin: 10px 0; background: #f9f9f9; }
+        .multi-select-item { display: flex; align-items: center; gap: 8px; padding: 8px; border-bottom: 1px solid #eee; }
+        .multi-select-item:last-child { border-bottom: none; }
+        .multi-select-item input[type="checkbox"] { width: 18px; height: 18px; }
+
+        /* تنسيق عرض المسؤولين في خطة اليوم */
+        .persons-list { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 5px; font-size: 12px; color: var(--navy); }
+        .person-badge { background: #f0f7fa; padding: 2px 8px; border-radius: 12px; display: inline-flex; align-items: center; gap: 3px; }
+        .add-person-btn { background: none; border: 1px dashed var(--teal); color: var(--teal); border-radius: 50%; width: 24px; height: 24px; display: inline-flex; align-items: center; justify-content: center; font-size: 16px; cursor: pointer; margin-right: 5px; }
     </style>
 </head>
 <body>
@@ -85,6 +125,7 @@
         <img src="https://j.top4top.io/p_3692l51ap0.png" class="header-logo">
     </header>
 
+    <!-- لوحة الإحصائيات الذكية (Hub) -->
     <div id="employee-hub">
         <div class="hub-header">
             <div style="display:flex; justify-content:space-between; align-items:center;">
@@ -92,39 +133,67 @@
                 <button onclick="toggleHub(false)" style="background:none; border:none; color:white; font-size:28px;">×</button>
             </div>
         </div>
+        <!-- تبويبات الهب -->
+        <div class="hub-tabs">
+            <div class="hub-tab active" onclick="switchHubTab('stats')">📊 الإحصائيات</div>
+            <div class="hub-tab" onclick="switchHubTab('control')">🛠️ التحكم</div>
+        </div>
         <div class="hub-content">
-            <div class="stat-grid">
-                <div class="stat-box"><span id="st-visits" class="stat-val">0</span><span class="stat-lbl">زيارات هذا الشهر</span></div>
-                <div class="stat-box"><span id="st-comps" class="stat-val">0</span><span class="stat-lbl">عملاء مميزين</span></div>
-            </div>
+            <!-- محتوى تبويب الإحصائيات -->
+            <div id="hub-stats" class="hub-tab-content active">
+                <div class="stat-grid">
+                    <div class="stat-box"><span id="st-visits" class="stat-val">0</span><span class="stat-lbl">زيارات هذا الشهر</span></div>
+                    <div class="stat-box"><span id="st-comps" class="stat-val">0</span><span class="stat-lbl">عملاء مميزين</span></div>
+                </div>
 
-            <div class="card" style="border: none; background: linear-gradient(135deg, #023652 0%, #054a6d 100%); color: white;">
-                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 8px;">
-                    <div style="display:flex; align-items:center; gap:12px;">
-                        <div style="background: rgba(28, 181, 181, 0.2); padding: 8px; border-radius: 12px; display: flex;">
-                            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#1cb5b5" stroke-width="2.5"><circle cx="12" cy="12" r="10"></circle><circle cx="12" cy="12" r="6"></circle><circle cx="12" cy="12" r="2"></circle></svg>
+                <div class="card" style="border: none; background: linear-gradient(135deg, #023652 0%, #054a6d 100%); color: white;">
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 8px;">
+                        <div style="display:flex; align-items:center; gap:12px;">
+                            <div style="background: rgba(28, 181, 181, 0.2); padding: 8px; border-radius: 12px; display: flex;">
+                                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#1cb5b5" stroke-width="2.5"><circle cx="12" cy="12" r="10"></circle><circle cx="12" cy="12" r="6"></circle><circle cx="12" cy="12" r="2"></circle></svg>
+                            </div>
+                            <span style="font-weight: 900; font-size: 15px;">هدف الزيارات الشهري</span>
                         </div>
-                        <span style="font-weight: 900; font-size: 15px;">هدف الزيارات الشهري</span>
+                        <span id="target-pct" style="font-weight: 900; color: var(--teal); background: white; padding: 2px 8px; border-radius: 8px; font-size: 12px;">0%</span>
                     </div>
-                    <span id="target-pct" style="font-weight: 900; color: var(--teal); background: white; padding: 2px 8px; border-radius: 8px; font-size: 12px;">0%</span>
+                    <div class="progress-container"><div id="target-bar" class="progress-bar"></div></div>
+                    <div style="display:flex; justify-content:space-between; margin-top:8px; font-size:11px; font-weight:bold; opacity:0.8;">
+                        <span>نسبة الإنجاز</span>
+                        <span>المستهدف: 60 زيارة</span>
+                    </div>
                 </div>
-                <div class="progress-container"><div id="target-bar" class="progress-bar"></div></div>
-                <div style="display:flex; justify-content:space-between; margin-top:8px; font-size:11px; font-weight:bold; opacity:0.8;">
-                    <span>نسبة الإنجاز</span>
-                    <span>المستهدف: 60 زيارة</span>
+
+                <div class="card">
+                    <label><svg class="label-icon" viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg> أكثر المناطق نشاطاً هذا الشهر</label>
+                    <div id="top-zones" class="tag-list"></div>
                 </div>
+
+                <button onclick="downloadMonthlyPDF()" class="btn-neon" style="background:var(--navy); margin-top:20px;">📄 تحميل تقرير الشهر بالكامل PDF</button>
             </div>
 
-            <div class="card">
-                <label><svg class="label-icon" viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg> أكثر المناطق نشاطاً هذا الشهر</label>
-                <div id="top-zones" class="tag-list"></div>
-            </div>
+            <!-- محتوى تبويب التحكم (مع خاصية الاختيار المتعدد) -->
+            <div id="hub-control" class="hub-tab-content">
+                <div class="card">
+                    <h3 style="color:var(--navy); display:flex; align-items:center; gap:8px;"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg> التحكم في خطة الأسبوع</h3>
+                    
+                    <!-- تبويبات الأيام -->
+                    <div style="display:flex; gap:8px; overflow-x:auto; padding:10px 0; margin-bottom:10px;" id="admin-days-tabs"></div>
 
-            <button onclick="downloadMonthlyPDF()" class="btn-neon" style="background:var(--navy); margin-top:20px;">📄 تحميل تقرير الشهر بالكامل PDF</button>
+                    <!-- قائمة الشركات المختارة لهذا اليوم (قابلة للسحب) -->
+                    <p style="font-weight:bold;">الشركات المقررة (اسحب لإعادة الترتيب):</p>
+                    <div id="admin-company-list" class="company-list-scroll" style="padding:5px; max-height: 250px;"></div>
+
+                    <!-- قسم إضافة شركات متعددة -->
+                    <p style="font-weight:bold; margin-top:15px;">إضافة شركات لليوم:</p>
+                    <div class="multi-select-list" id="multi-select-companies"></div>
+                    <button onclick="addSelectedCompanies()" class="btn-neon" style="margin-top:10px;">➕ إضافة المحددة لليوم</button>
+                </div>
+            </div>
         </div>
     </div>
 
     <div class="container" id="app-content" style="display:none;">
+        <!-- الصفحة الرئيسية (خطة اليوم) -->
         <div id="p-home" class="page active">
             <div class="cal-head">
                 <button class="nav-btn" onclick="moveMonth(-1)"><svg style="width:20px;height:20px" viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6" stroke="currentColor" stroke-width="3"/></svg></button>
@@ -132,6 +201,12 @@
                 <button class="nav-btn" onclick="moveMonth(1)"><svg style="width:20px;height:20px" viewBox="0 0 24 24"><path d="M9 18l6-6-6-6" stroke="currentColor" stroke-width="3"/></svg></button>
             </div>
             <div class="cal-grid" id="calendar"></div>
+            
+            <!-- خطة اليوم (الشركات المقررة) -->
+            <h3 style="font-size:18px; margin:20px 0 10px 0; color:var(--navy);">📋 خطة اليوم</h3>
+            <div id="planned-visits" style="margin-top:10px;"></div>
+
+            <!-- الزيارات المنفذة اليوم -->
             <div style="display:flex; justify-content:space-between; align-items:center; margin-top:25px;">
                 <h3 style="font-size:18px; margin:0; color:var(--navy);">زيارات اليوم</h3>
                 <div class="dropdown">
@@ -145,29 +220,36 @@
             <div id="daily-visits" style="margin-top:15px;"></div>
         </div>
 
+        <!-- صفحة إضافة شركة جديدة -->
         <div id="p-add" class="page">
             <div class="card">
-                <label><svg class="label-icon" viewBox="0 0 24 24"><path d="M3 21h18M3 7l9-4 9 4v10H3V7z"/></svg> اسم الشركة</label>
-                <input type="text" id="comp-name" list="comp-dl" class="input">
+                <label><svg class="label-icon" viewBox="0 0 24 24"><path d="M3 21h18M3 7l9-4 9 4v10H3V7z"/></svg> اسم الشركة الجديدة</label>
+                <input type="text" id="comp-name" list="comp-dl" class="input" placeholder="اسم الشركة">
                 <datalist id="comp-dl"></datalist>
                 
                 <label><svg class="label-icon" viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg> المنطقة</label>
                 <select id="comp-zone" class="input" onchange="checkNewZone(this)"></select>
 
+                <!-- أيام الزيارة المقررة (اختياري) -->
+                <label><svg class="label-icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> أيام الزيارة المقررة (اختياري)</label>
+                <div class="days-checkbox-group" id="plan-days-checkboxes"></div>
+
                 <label><svg class="label-icon" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg> بيانات المسؤولين</label>
                 <div id="persons-container"></div>
-                <button onclick="addPerson()" style="width:100%; border:1px solid #ddd; padding:8px; border-radius:10px; margin-bottom:15px; font-size:12px; background:none;">+ إضافة مسؤول</button>
+                <button onclick="addPerson()" type="button" style="width:100%; border:1px solid #ddd; padding:8px; border-radius:10px; margin-bottom:15px; font-size:12px; background:none;">+ إضافة مسؤول</button>
 
-                <label><svg class="label-icon" viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121(o 1 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg> ملخص الزيارة</label>
-                <textarea id="v-note" class="input" rows="3"></textarea>
-                
+                <!-- ملاحظات عامة -->
+                <label><svg class="label-icon" viewBox="0 0 24 24"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg> ملاحظات عامة (اختياري)</label>
+                <textarea id="comp-general-notes" class="input" rows="2"></textarea>
+
                 <input type="hidden" id="v-location">
                 <p id="gps-status" style="font-size:11px; color:var(--teal); text-align:center; margin-top:-10px;"></p>
                 
-                <button onclick="saveVisit()" class="btn-neon">حفظ الزيارة</button>
+                <button onclick="saveNewCompany()" class="btn-neon">➕ إضافة شركة جديدة</button>
             </div>
         </div>
 
+        <!-- صفحة البيانات (عرض الشركات) مع تحسين التمرير -->
         <div id="p-data" class="page">
             <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px; margin-bottom:15px;">
                 <button onclick="exportData()" style="padding:10px; border-radius:10px; border:1px solid #ddd; background:white; font-size:12px; font-weight:bold;">نسخة احتياطية</button>
@@ -175,10 +257,11 @@
                 <input type="file" id="imp-f" style="display:none" onchange="importData(event)">
             </div>
             <input type="text" id="comp-search" class="input" placeholder="بحث باسم الشركة أو المنطقة..." oninput="renderComps()">
-            <div id="company-list"></div>
+            <div id="company-list" class="company-list-scroll"></div>
         </div>
     </div>
 
+    <!-- مودال التعديل الشامل (بالضغط المطول) -->
     <div id="edit-full-modal" onclick="closeEditFullModal()" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.6); z-index:5000; padding:15px; align-items:center; justify-content:center;">
         <div class="card" style="width:100%; max-width:450px; max-height:90vh; overflow-y:auto;" onclick="event.stopPropagation()">
             <h3 style="color:var(--navy); margin-top:0;">تعديل شامل للبيانات</h3>
@@ -190,9 +273,15 @@
             <label>المنطقة</label>
             <select id="edit-zone" class="input"></select>
             
+            <label>أيام الزيارة المقررة (اختياري)</label>
+            <div class="days-checkbox-group" id="edit-plan-days-checkboxes"></div>
+
             <label>المسؤولين</label>
             <div id="edit-persons-container"></div>
-            <button onclick="addPersonToEdit()" style="width:100%; border:1px solid #ddd; padding:8px; border-radius:10px; margin-bottom:15px; font-size:11px;">+ إضافة مسؤول</button>
+            <button onclick="addPersonToEdit()" type="button" style="width:100%; border:1px solid #ddd; padding:8px; border-radius:10px; margin-bottom:15px; font-size:11px;">+ إضافة مسؤول</button>
+
+            <label>ملاحظات عامة</label>
+            <textarea id="edit-general-notes" class="input" rows="2"></textarea>
 
             <label>سجل الملاحظات (أحدث زيارة)</label>
             <textarea id="edit-last-note" class="input" rows="3"></textarea>
@@ -202,6 +291,35 @@
         </div>
     </div>
 
+    <!-- مودال تسجيل زيارة من الخطة -->
+    <div id="visit-modal" onclick="closeVisitModal()" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.6); z-index:3500; padding:20px; align-items:center; justify-content:center;">
+        <div class="card" style="width:100%; max-width:400px;" onclick="event.stopPropagation()">
+            <h3 style="color:var(--navy); margin-top:0;">تسجيل زيارة</h3>
+            <p><b id="visit-modal-company"></b> - <span id="visit-modal-date"></span></p>
+            <textarea id="visit-modal-note" class="input" rows="3" placeholder="ملاحظات الزيارة"></textarea>
+            <button class="btn-neon" onclick="saveVisitFromPlan()">حفظ الزيارة</button>
+            <button onclick="closeVisitModal()" style="width:100%; background:#666; color:white; border:none; padding:12px; border-radius:14px; margin-top:8px; font-weight:bold;">إلغاء</button>
+        </div>
+    </div>
+
+    <!-- مودال إضافة مسؤول من خطة اليوم -->
+    <div id="add-person-modal" onclick="closeAddPersonModal()" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.6); z-index:3600; padding:20px; align-items:center; justify-content:center;">
+        <div class="card" style="width:100%; max-width:400px;" onclick="event.stopPropagation()">
+            <h3 style="color:var(--navy); margin-top:0;">➕ إضافة مسؤول للشركة</h3>
+            <p><b id="add-person-company-name"></b></p>
+            <select id="add-person-title" class="input">
+                <option>دكتور</option>
+                <option>أستاذ</option>
+                <option>أستاذة</option>
+            </select>
+            <input type="text" id="add-person-name" class="input" placeholder="اسم المسؤول">
+            <input type="tel" id="add-person-phone" class="input" placeholder="رقم الموبايل">
+            <button class="btn-neon" onclick="saveNewPerson()">حفظ المسؤول</button>
+            <button onclick="closeAddPersonModal()" style="width:100%; background:#666; color:white; border:none; padding:12px; border-radius:14px; margin-top:8px; font-weight:bold;">إلغاء</button>
+        </div>
+    </div>
+
+    <!-- مودال عرض تفاصيل الشركة -->
     <div id="details-modal" onclick="closeModal()" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.6); z-index:3000; padding:20px; align-items:center; justify-content:center;">
         <div class="card" style="width:100%; max-width:400px; max-height:80vh; overflow-y:auto;" onclick="event.stopPropagation()">
             <h2 id="modal-title" style="color:var(--navy); margin-top:0;"></h2>
@@ -210,6 +328,7 @@
         </div>
     </div>
 
+    <!-- قالب PDF -->
     <div id="pdf-template" style="display:none; padding:40px; font-family:'Cairo';">
         <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:2px solid var(--navy); padding-bottom:10px;">
             <div><h1 style="color:var(--navy); margin:0;">تقرير زيارات فيزيو مصر</h1><p id="pdf-user-info"></p></div>
@@ -224,22 +343,72 @@
 
     <nav id="app-nav" style="display:none;">
         <div class="nav-link active" onclick="tab('p-home', this)"><svg class="icon" viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>الرئيسية</div>
-        <div class="nav-link" onclick="tab('p-add', this); getLocation();"><svg class="icon" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>تسجيل</div>
+        <div class="nav-link" onclick="tab('p-add', this); getLocation();"><svg class="icon" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>إضافة شركة</div>
         <div class="nav-link" onclick="tab('p-data', this)"><svg class="icon" viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20M4 19.5A2.5 2.5 0 0 0 6.5 22H20M4 19.5V3A2.5 2.5 0 0 1 6.5 0.5H20v16.5H6.5a2.5 2.5 0 0 0-2.5 3z"/></svg>البيانات</div>
     </nav>
 
     <script>
-        let db = JSON.parse(localStorage.getItem('PHYSIO_V35')) || { 
-            user: "", visits: [], companies: [], zones: ["المعادي", "الدقي", "مدينة نصر", "المقطم", "حلوان", "العبور"]
+        let db = JSON.parse(localStorage.getItem('PHYSIO_V44')) || { 
+            user: "", 
+            visits: [], 
+            companies: [], 
+            zones: ["المعادي", "الدقي", "مدينة نصر", "المقطم", "حلوان", "العبور"],
+            weeklyPlan: [[], [], [], [], []] // مصفوفة من 5 أيام، كل عنصر مصفوفة بأسماء الشركات المقررة (بالترتيب)
         };
         let viewM = new Date(), selD = new Date().toDateString();
-        let pressTimer;
+        let pressTimer, currentAdminDay = new Date().getDay(); // 0-4
+        let sortableInstance = null; // لتخزين كائن Sortable
+        let currentCompanyForPerson = ""; // لتخزين اسم الشركة عند إضافة مسؤول
+
+        // متغيرات للتعامل مع اللمس في صفحة البيانات
+        let touchStartX = 0, touchStartY = 0;
+        let touchMoved = false;
+
+        // أسماء أيام الأسبوع بالعربية
+        const dayNames = ["الأحد", "الإثنين", "الثلاثاء", "الأربعاء", "الخميس"];
 
         window.onload = function() { 
+            // التأكد من وجود weeklyPlan
+            if (!db.weeklyPlan) db.weeklyPlan = [[], [], [], [], []];
+            // التأكد من أن كل شركة لديها حقل notes (اختياري)
+            db.companies = db.companies.map(c => {
+                if (!c.notes) c.notes = "";
+                if (!c.plannedDays) c.plannedDays = [];
+                if (!c.persons) c.persons = [];
+                return c;
+            });
+
             if (!db.user) document.getElementById('login-screen').style.display = 'flex'; 
             else runSplash(); 
             if(!document.getElementById('persons-container').children.length) addPerson(); 
+            renderDayCheckboxes();
         };
+
+        // تعبئة Checkboxes أيام الأسبوع
+        function renderDayCheckboxes() {
+            let html = '';
+            for (let i = 0; i < 5; i++) {
+                html += `<label><input type="checkbox" value="${i}"> ${dayNames[i]}</label>`;
+            }
+            document.getElementById('plan-days-checkboxes').innerHTML = html;
+            document.getElementById('edit-plan-days-checkboxes').innerHTML = html;
+        }
+
+        // جلب الأيام المختارة من checkboxes
+        function getSelectedDays(containerId) {
+            let selected = [];
+            document.querySelectorAll(`#${containerId} input[type=checkbox]:checked`).forEach(cb => {
+                selected.push(parseInt(cb.value));
+            });
+            return selected;
+        }
+
+        // تحديد checkboxes بناءً على مصفوفة أيام
+        function setSelectedDays(containerId, daysArray) {
+            document.querySelectorAll(`#${containerId} input[type=checkbox]`).forEach(cb => {
+                cb.checked = daysArray.includes(parseInt(cb.value));
+            });
+        }
 
         function firstTimeLogin() { const u = document.getElementById('user-input').value.trim(); if(u){ db.user=u; refresh(); runSplash(); } }
         function runSplash() { 
@@ -252,87 +421,292 @@
         function start() { document.getElementById('app-header').style.display='grid'; document.getElementById('app-content').style.display='block'; document.getElementById('app-nav').style.display='flex'; document.getElementById('user-display').innerText = db.user; refresh(); }
 
         function refresh() { 
-            localStorage.setItem('PHYSIO_V35', JSON.stringify(db)); 
-            renderCal(); renderVisits(); renderComps(); renderHubStats();
+            localStorage.setItem('PHYSIO_V44', JSON.stringify(db)); 
+            renderCal(); 
+            renderVisits(); 
+            renderPlannedToday(); 
+            renderComps(); 
+            renderHubStats();
+            // تحديث قوائم المناطق
             const zOpts = db.zones.map(z=>`<option>${z}</option>`).join('') + `<option value="NEW">+ منطقة جديدة</option>`;
             document.getElementById('comp-zone').innerHTML = zOpts; 
             document.getElementById('edit-zone').innerHTML = db.zones.map(z=>`<option>${z}</option>`).join('');
             document.getElementById('comp-dl').innerHTML = db.companies.map(c=>`<option value="${c.name}">`).join(''); 
+            // إذا كان الهب مفتوحاً، نحدث محتوى التحكم
+            if (document.getElementById('employee-hub').style.display === 'flex') {
+                renderAdminTabs();
+                renderAdminCompanyList();
+                renderMultiSelectCompanies();
+            }
         }
 
-        function renderHubStats() {
-            const mVisits = db.visits.filter(v => {
-                const d = new Date(v.date);
-                return d.getMonth() === viewM.getMonth() && d.getFullYear() === viewM.getFullYear();
+        // عرض خطة اليوم في الصفحة الرئيسية مع أسماء المسؤولين وزر الإضافة
+        function renderPlannedToday() {
+            const selectedDate = new Date(selD);
+            const dayOfWeek = selectedDate.getDay(); // 0 = الأحد ... 4 = الخميس
+            if (dayOfWeek > 4) {
+                document.getElementById('planned-visits').innerHTML = '<p class="card" style="text-align:center; opacity:0.7;">اليوم عطلة نهاية الأسبوع - لا توجد خطة</p>';
+                return;
+            }
+
+            const plannedCompanyNames = db.weeklyPlan[dayOfWeek] || [];
+            // استثناء الشركات التي تمت زيارتها اليوم
+            const visitedToday = new Set(db.visits.filter(v => v.date === selD).map(v => v.company));
+            const companiesToShow = plannedCompanyNames.filter(name => !visitedToday.has(name));
+
+            if (companiesToShow.length === 0) {
+                document.getElementById('planned-visits').innerHTML = '<p class="card" style="text-align:center; opacity:0.7;">لا توجد شركات مقررة لليوم (أو تمت زيارتها)</p>';
+                return;
+            }
+
+            let html = '';
+            companiesToShow.forEach(name => {
+                const company = db.companies.find(c => c.name === name);
+                if (!company) return;
+                // تجميع أسماء المسؤولين
+                let personsHtml = '';
+                if (company.persons && company.persons.length) {
+                    personsHtml = '<div class="persons-list">' + company.persons.map(p => 
+                        `<span class="person-badge">👤 ${p.title} ${p.name}</span>`
+                    ).join('') + '</div>';
+                }
+                html += `
+                    <div class="card" style="border-right:5px solid var(--teal);">
+                        <div style="display:flex; justify-content:space-between; align-items:center;" onclick="openVisitModal('${company.name.replace(/'/g, "\\'")}')">
+                            <div><b>${company.name}</b><br><small>📍 ${company.zone}</small></div>
+                        </div>
+                        ${personsHtml}
+                        <div style="margin-top:8px; text-align:left;">
+                            <button class="add-person-btn" onclick="openAddPersonModal('${company.name.replace(/'/g, "\\'")}')">➕</button>
+                        </div>
+                    </div>`;
             });
-            document.getElementById('st-visits').innerText = mVisits.length;
-            document.getElementById('st-comps').innerText = new Set(mVisits.map(v => v.company)).size;
-            let pct = Math.min(Math.round((mVisits.length / 60) * 100), 100);
-            document.getElementById('target-bar').style.width = pct + '%';
-            document.getElementById('target-pct').innerText = pct + '%';
-            let zCounts = {};
-            mVisits.forEach(v => {
-                const c = db.companies.find(co => co.name === v.company);
-                if(c) zCounts[c.zone] = (zCounts[c.zone] || 0) + 1;
-            });
-            let sorted = Object.entries(zCounts).sort((a,b) => b[1]-a[1]).slice(0,3);
-            document.getElementById('top-zones').innerHTML = sorted.map(z => `<div class="tag-item">${z[0]} (${z[1]})</div>`).join('') || '<small>لا بيانات كافية</small>';
+            document.getElementById('planned-visits').innerHTML = html;
         }
 
-        function getLocation() { const s = document.getElementById('gps-status'); if (navigator.geolocation) { navigator.geolocation.getCurrentPosition((pos) => { document.getElementById('v-location').value = `https://www.google.com/maps?q=${pos.coords.latitude},${pos.coords.longitude}`; s.innerText = "تم تحديد الموقع بنجاح ✅"; }, () => { s.innerText = "تعذر جلب الموقع."; }); } }
-        
-        function saveVisit() {
+        // فتح مودال إضافة مسؤول
+        function openAddPersonModal(companyName) {
+            currentCompanyForPerson = companyName;
+            document.getElementById('add-person-company-name').innerText = companyName;
+            document.getElementById('add-person-title').value = 'دكتور';
+            document.getElementById('add-person-name').value = '';
+            document.getElementById('add-person-phone').value = '';
+            document.getElementById('add-person-modal').style.display = 'flex';
+        }
+
+        function closeAddPersonModal() {
+            document.getElementById('add-person-modal').style.display = 'none';
+        }
+
+        // حفظ المسؤول الجديد
+        function saveNewPerson() {
+            const companyName = currentCompanyForPerson;
+            const title = document.getElementById('add-person-title').value;
+            const name = document.getElementById('add-person-name').value.trim();
+            const phone = document.getElementById('add-person-phone').value.trim();
+            if (!name) return alert('يرجى إدخال اسم المسؤول');
+
+            const company = db.companies.find(c => c.name === companyName);
+            if (company) {
+                if (!company.persons) company.persons = [];
+                company.persons.push({ title, name, phone });
+                localStorage.setItem('PHYSIO_V44', JSON.stringify(db));
+                refresh();
+                closeAddPersonModal();
+            }
+        }
+
+        // فتح مودال تسجيل الزيارة
+        function openVisitModal(companyName) {
+            document.getElementById('visit-modal-company').innerText = companyName;
+            document.getElementById('visit-modal-date').innerText = selD;
+            document.getElementById('visit-modal-note').value = '';
+            document.getElementById('visit-modal').style.display = 'flex';
+        }
+
+        function closeVisitModal() {
+            document.getElementById('visit-modal').style.display = 'none';
+        }
+
+        // حفظ الزيارة من المودال
+        function saveVisitFromPlan() {
+            const company = document.getElementById('visit-modal-company').innerText;
+            const note = document.getElementById('visit-modal-note').value.trim();
+            if (!note) return alert('يرجى كتابة ملاحظة للزيارة');
+
+            db.visits.push({ company, note, date: selD, timestamp: new Date().toLocaleTimeString('ar-EG') });
+            refresh();
+            closeVisitModal();
+        }
+
+        // حفظ شركة جديدة
+        function saveNewCompany() {
             const name = document.getElementById('comp-name').value.trim();
             const zone = document.getElementById('comp-zone').value;
-            const note = document.getElementById('v-note').value.trim();
             if(!name) return alert("يرجى كتابة اسم الشركة");
             
+            if (db.companies.some(c => c.name === name)) {
+                return alert("هذه الشركة موجودة بالفعل! استخدم البحث أو الضغط المطول لتعديلها.");
+            }
+
             let pList = []; 
             document.querySelectorAll('#persons-container > div').forEach(d => { 
                 const n = d.querySelector('.p-name').value.trim(); 
                 if(n) pList.push({ title: d.querySelector('.p-title').value, name: n, phone: d.querySelector('.p-phone').value }); 
             });
 
-            let cIdx = db.companies.findIndex(c => c.name === name);
-            if(cIdx === -1) db.companies.push({ name, zone, persons: pList, location: document.getElementById('v-location').value });
-            else { db.companies[cIdx].zone = zone; if(pList.length) db.companies[cIdx].persons = pList; }
+            const plannedDays = getSelectedDays('plan-days-checkboxes');
+            const generalNotes = document.getElementById('comp-general-notes').value.trim();
+
+            db.companies.push({ 
+                name, 
+                zone, 
+                persons: pList, 
+                location: document.getElementById('v-location').value,
+                plannedDays: plannedDays,
+                notes: generalNotes
+            });
             
-            db.visits.push({ company: name, note, date: selD, timestamp: new Date().toLocaleTimeString('ar-EG') });
-            
-            document.getElementById('comp-name').value=''; document.getElementById('v-note').value=''; 
-            document.getElementById('persons-container').innerHTML = ''; addPerson();
-            refresh(); tab('p-home', document.querySelectorAll('.nav-link')[0]); 
+            // مسح الحقول
+            document.getElementById('comp-name').value=''; 
+            document.getElementById('persons-container').innerHTML = ''; 
+            addPerson();
+            document.getElementById('v-location').value = '';
+            document.getElementById('gps-status').innerText = '';
+            document.getElementById('comp-general-notes').value = '';
+            document.querySelectorAll('#plan-days-checkboxes input[type=checkbox]').forEach(cb => cb.checked = false);
+
+            refresh(); 
+            tab('p-home', document.querySelectorAll('.nav-link')[0]);
         }
 
+        // عرض الشركات في صفحة البيانات (مع تحسين اللمس)
         function renderComps() { 
             const s = document.getElementById('comp-search').value.toLowerCase(); 
             const f = db.companies.filter(c => c.name.toLowerCase().includes(s) || c.zone.toLowerCase().includes(s)); 
-            document.getElementById('company-list').innerHTML = f.map(c => `
-                <div class="card" 
-                     style="display:flex; justify-content:space-between; align-items:center;"
-                     onmousedown="startLongPress('${c.name.replace(/'/g, "\\'")}')" 
-                     onmouseup="endLongPress('${c.name.replace(/'/g, "\\'")}')" 
-                     ontouchstart="startLongPress('${c.name.replace(/'/g, "\\'")}')" 
-                     ontouchend="endLongPress('${c.name.replace(/'/g, "\\'")}')">
-                    <div><b>${c.name}</b><br><small>📍 ${c.zone}</small></div>
+            let html = '';
+            f.forEach(c => {
+                const daysStr = (c.plannedDays || []).map(d => dayNames[d]).join('، ');
+                html += `
+                <div class="card company-item" 
+                     data-name="${c.name.replace(/'/g, "\\'")}"
+                     style="display:flex; justify-content:space-between; align-items:center;">
+                    <div>
+                        <b>${c.name}</b><br>
+                        <small>📍 ${c.zone}</small><br>
+                        ${daysStr ? '<small class="planned-day-badge">🗓️ ' + daysStr + '</small>' : ''}
+                        ${c.notes ? '<br><small>📝 ' + c.notes + '</small>' : ''}
+                        ${c.persons && c.persons.length ? '<br><small>👤 ' + c.persons.map(p => p.name).join(' - ') + '</small>' : ''}
+                    </div>
                     <svg style="width:14px; color:var(--teal);" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M15 18l-6-6 6-6" /></svg>
-                </div>`).join(''); 
+                </div>`;
+            });
+            document.getElementById('company-list').innerHTML = html;
+
+            // إضافة مستمعات اللمس لكل عنصر
+            document.querySelectorAll('.company-item').forEach(item => {
+                const name = item.getAttribute('data-name');
+                attachTouchEvents(item, name);
+            });
         }
 
-        // منطق الضغط المطول للتعديل
-        function startLongPress(name) { pressTimer = setTimeout(() => { openFullEdit(name); pressTimer = null; }, 800); }
-        function endLongPress(name) { if(pressTimer) { clearTimeout(pressTimer); pressTimer = null; showCompDetails(name); } }
+        // دوال اللمس للتمييز بين النقر والتمرير
+        function attachTouchEvents(element, companyName) {
+            let touchStartTime;
+            let touchStartX, touchStartY;
+            let longPressTriggered = false;
 
+            element.addEventListener('touchstart', (e) => {
+                touchStartTime = Date.now();
+                touchStartX = e.touches[0].clientX;
+                touchStartY = e.touches[0].clientY;
+                touchMoved = false;
+                longPressTriggered = false;
+
+                // بدء مؤقت الضغط المطول
+                pressTimer = setTimeout(() => {
+                    longPressTriggered = true;
+                    openFullEdit(companyName);
+                }, 800);
+            }, { passive: true });
+
+            element.addEventListener('touchmove', (e) => {
+                if (!touchStartX || !touchStartY) return;
+                const dx = Math.abs(e.touches[0].clientX - touchStartX);
+                const dy = Math.abs(e.touches[0].clientY - touchStartY);
+                if (dx > 10 || dy > 10) {
+                    touchMoved = true;
+                    if (pressTimer) {
+                        clearTimeout(pressTimer);
+                        pressTimer = null;
+                    }
+                }
+            }, { passive: true });
+
+            element.addEventListener('touchend', (e) => {
+                if (pressTimer) {
+                    clearTimeout(pressTimer);
+                    pressTimer = null;
+                }
+                const touchEndTime = Date.now();
+                const touchDuration = touchEndTime - touchStartTime;
+
+                // إذا لم تكن هناك حركة والمدة أقل من 300 مللي (نقرة قصيرة) ولم يتم تفعيل الضغط المطول
+                if (!touchMoved && touchDuration < 300 && !longPressTriggered) {
+                    showCompDetails(companyName);
+                }
+            });
+
+            // للفأرة (اختبار على الكمبيوتر)
+            element.addEventListener('mousedown', (e) => {
+                touchStartTime = Date.now();
+                touchMoved = false;
+                longPressTriggered = false;
+                pressTimer = setTimeout(() => {
+                    longPressTriggered = true;
+                    openFullEdit(companyName);
+                }, 800);
+            });
+
+            element.addEventListener('mousemove', (e) => {
+                // لا يمكن تتبع حركة الماوس بسهولة، لذا نعتبر أي حركة إلغاء
+                if (pressTimer) {
+                    clearTimeout(pressTimer);
+                    pressTimer = null;
+                }
+            });
+
+            element.addEventListener('mouseup', (e) => {
+                if (pressTimer) {
+                    clearTimeout(pressTimer);
+                    pressTimer = null;
+                }
+                const mouseUpTime = Date.now();
+                const duration = mouseUpTime - touchStartTime;
+                if (!touchMoved && duration < 300 && !longPressTriggered) {
+                    showCompDetails(companyName);
+                }
+            });
+        }
+
+        // الضغط المطول (تم تضمينه أعلاه، ولكن نحتاج الدوال القديمة أيضاً)
+        function startLongPress(name) { /* لن نستخدمها بعد الآن */ }
+        function endLongPress(name) { /* لن نستخدمها بعد الآن */ }
+
+        // فتح التعديل الشامل (ضغط مطول)
         function openFullEdit(name) {
             const c = db.companies.find(co => co.name === name);
             if(!c) return;
             document.getElementById('edit-original-name').value = c.name;
             document.getElementById('edit-name').value = c.name;
             document.getElementById('edit-zone').value = c.zone;
-            
+            setSelectedDays('edit-plan-days-checkboxes', c.plannedDays || []);
+
             const cont = document.getElementById('edit-persons-container');
             cont.innerHTML = '';
             (c.persons || []).forEach(p => addPersonToEdit(p));
+
+            document.getElementById('edit-general-notes').value = c.notes || '';
             
             const vs = db.visits.filter(v => v.company === name);
             document.getElementById('edit-last-note').value = vs.length ? vs[vs.length-1].note : "";
@@ -358,6 +732,8 @@
             const oldN = document.getElementById('edit-original-name').value;
             const newN = document.getElementById('edit-name').value.trim();
             const newZ = document.getElementById('edit-zone').value;
+            const newPlannedDays = getSelectedDays('edit-plan-days-checkboxes');
+            const newNotes = document.getElementById('edit-general-notes').value.trim();
             
             if(!newN) return alert("الاسم مطلوب");
             
@@ -372,6 +748,8 @@
                 db.companies[cIdx].name = newN;
                 db.companies[cIdx].zone = newZ;
                 db.companies[cIdx].persons = pList;
+                db.companies[cIdx].plannedDays = newPlannedDays;
+                db.companies[cIdx].notes = newNotes;
                 
                 db.visits.forEach(v => {
                     if(v.company === oldN) {
@@ -379,6 +757,10 @@
                         if(v === db.visits.filter(x => x.company === newN).pop()) v.note = document.getElementById('edit-last-note').value;
                     }
                 });
+                // تحديث أسماء الشركات في weeklyPlan إذا تغير الاسم
+                for (let day=0; day<5; day++) {
+                    db.weeklyPlan[day] = db.weeklyPlan[day].map(n => n === oldN ? newN : n);
+                }
                 refresh();
                 closeEditFullModal();
             }
@@ -386,6 +768,7 @@
 
         function closeEditFullModal() { document.getElementById('edit-full-modal').style.display = 'none'; }
 
+        // التقويم
         function renderCal() { 
             const grid = document.getElementById('calendar'); grid.innerHTML = ''; 
             const y = viewM.getFullYear(), m = viewM.getMonth(); 
@@ -405,6 +788,10 @@
             const vs = db.visits.filter(v => v.company === name); 
             document.getElementById('modal-title').innerText = c.name; 
             let h = `<p><b>المنطقة:</b> ${c.zone}</p>`; 
+            if (c.plannedDays && c.plannedDays.length) {
+                h += `<p><b>أيام الزيارة:</b> ${c.plannedDays.map(d => dayNames[d]).join(' - ')}</p>`;
+            }
+            if (c.notes) h += `<p><b>ملاحظات عامة:</b> ${c.notes}</p>`;
             if(c.location) h += `<p><b>العنوان:</b> <a href="${c.location}" target="_blank" style="color:var(--teal);">فتح الخريطة 📍</a></p>`; 
             h += `<hr><h4>المسؤولين:</h4>`; (c.persons||[]).forEach(p => h += `<p>• ${p.title}/ ${p.name} (${p.phone})</p>`); 
             h += `<hr><h4>سجل الزيارات:</h4>`; vs.forEach(v => h += `<p style="font-size:12px; border-bottom:1px solid #eee; padding:5px 0;">📅 ${v.date}: ${v.note}</p>`); 
@@ -418,6 +805,29 @@
             document.getElementById('persons-container').appendChild(div); 
         }
 
+        function getLocation() { const s = document.getElementById('gps-status'); if (navigator.geolocation) { navigator.geolocation.getCurrentPosition((pos) => { document.getElementById('v-location').value = `https://www.google.com/maps?q=${pos.coords.latitude},${pos.coords.longitude}`; s.innerText = "تم تحديد الموقع بنجاح ✅"; }, () => { s.innerText = "تعذر جلب الموقع."; }); } }
+
+        // إحصائيات
+        function renderHubStats() {
+            const mVisits = db.visits.filter(v => {
+                const d = new Date(v.date);
+                return d.getMonth() === viewM.getMonth() && d.getFullYear() === viewM.getFullYear();
+            });
+            document.getElementById('st-visits').innerText = mVisits.length;
+            document.getElementById('st-comps').innerText = new Set(mVisits.map(v => v.company)).size;
+            let pct = Math.min(Math.round((mVisits.length / 60) * 100), 100);
+            document.getElementById('target-bar').style.width = pct + '%';
+            document.getElementById('target-pct').innerText = pct + '%';
+            let zCounts = {};
+            mVisits.forEach(v => {
+                const c = db.companies.find(co => co.name === v.company);
+                if(c) zCounts[c.zone] = (zCounts[c.zone] || 0) + 1;
+            });
+            let sorted = Object.entries(zCounts).sort((a,b) => b[1]-a[1]).slice(0,3);
+            document.getElementById('top-zones').innerHTML = sorted.map(z => `<div class="tag-item">${z[0]} (${z[1]})</div>`).join('') || '<small>لا بيانات كافية</small>';
+        }
+
+        // دوال PDF والتصدير
         function downloadMonthlyPDF() {
             const mVisits = db.visits.filter(v => {
                 const d = new Date(v.date);
@@ -459,14 +869,176 @@
             window.open(`https://wa.me/?text=${fullMsg}`);
         }
 
-        function toggleHub(show) { document.getElementById('employee-hub').style.display = show ? 'flex' : 'none'; }
+        // دوال الهب
+        function toggleHub(show) { 
+            document.getElementById('employee-hub').style.display = show ? 'flex' : 'none'; 
+            if (show) {
+                // تحديث محتوى التحكم عند الفتح
+                renderAdminTabs();
+                renderAdminCompanyList();
+                renderMultiSelectCompanies();
+            }
+        }
+
+        function switchHubTab(tab) {
+            document.querySelectorAll('.hub-tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.hub-tab-content').forEach(c => c.classList.remove('active'));
+            if (tab === 'stats') {
+                document.querySelector('.hub-tab').classList.add('active');
+                document.getElementById('hub-stats').classList.add('active');
+            } else {
+                document.querySelectorAll('.hub-tab')[1].classList.add('active');
+                document.getElementById('hub-control').classList.add('active');
+                // تحديث محتوى التحكم عند التبديل إليه
+                renderAdminTabs();
+                renderAdminCompanyList();
+                renderMultiSelectCompanies();
+            }
+        }
+
+        // دوال التحكم (مع الاختيار المتعدد)
+        function renderAdminTabs() {
+            const tabsContainer = document.getElementById('admin-days-tabs');
+            if (!tabsContainer) return;
+            let html = '';
+            for (let i = 0; i < 5; i++) {
+                html += `<div class="admin-day-tab ${i === currentAdminDay ? 'active' : ''}" onclick="setAdminDay(${i})">${dayNames[i]}</div>`;
+            }
+            tabsContainer.innerHTML = html;
+        }
+
+        function setAdminDay(dayIndex) {
+            currentAdminDay = dayIndex;
+            renderAdminCompanyList();
+            renderMultiSelectCompanies();
+            // تحديث التبويبات النشطة
+            document.querySelectorAll('#admin-days-tabs .admin-day-tab').forEach((tab, idx) => {
+                if (idx === dayIndex) tab.classList.add('active');
+                else tab.classList.remove('active');
+            });
+        }
+
+        function renderAdminCompanyList() {
+            const listContainer = document.getElementById('admin-company-list');
+            if (!listContainer) return;
+            const companiesForDay = db.weeklyPlan[currentAdminDay] || [];
+            
+            if (companiesForDay.length === 0) {
+                listContainer.innerHTML = '<p class="card" style="text-align:center;">لا توجد شركات في هذا اليوم</p>';
+                return;
+            }
+
+            let html = '';
+            companiesForDay.forEach((companyName) => {
+                const company = db.companies.find(c => c.name === companyName);
+                if (!company) return;
+                html += `
+                    <div class="plan-company-row" data-company="${company.name.replace(/'/g, "\\'")}">
+                        <span class="drag-handle">☰</span>
+                        <div class="plan-company-info" onclick="showCompDetails('${company.name.replace(/'/g, "\\'")}')">
+                            <b>${company.name}</b><br>
+                            <small>📍 ${company.zone}</small>
+                        </div>
+                        <button class="delete-btn" onclick="removeCompanyFromDay('${company.name.replace(/'/g, "\\'")}')">حذف</button>
+                    </div>`;
+            });
+            listContainer.innerHTML = html;
+
+            // تفعيل السحب (drag and drop) باستخدام SortableJS
+            if (sortableInstance) sortableInstance.destroy();
+            sortableInstance = new Sortable(listContainer, {
+                animation: 150,
+                handle: '.drag-handle',
+                onEnd: function(evt) {
+                    // إعادة بناء المصفوفة حسب الترتيب الجديد
+                    const newOrder = [];
+                    const items = listContainer.querySelectorAll('.plan-company-row');
+                    items.forEach(item => {
+                        const companyName = item.getAttribute('data-company');
+                        if (companyName) newOrder.push(companyName);
+                    });
+                    db.weeklyPlan[currentAdminDay] = newOrder;
+                    localStorage.setItem('PHYSIO_V44', JSON.stringify(db));
+                    refresh(); // تحديث الصفحة الرئيسية
+                }
+            });
+        }
+
+        // عرض قائمة الشركات المتاحة للاختيار المتعدد
+        function renderMultiSelectCompanies() {
+            const container = document.getElementById('multi-select-companies');
+            if (!container) return;
+            
+            const existing = new Set(db.weeklyPlan[currentAdminDay] || []);
+            const available = db.companies.filter(c => !existing.has(c.name));
+            
+            if (available.length === 0) {
+                container.innerHTML = '<p style="text-align:center;">جميع الشركات مضافة بالفعل</p>';
+                return;
+            }
+
+            let html = '';
+            available.forEach(company => {
+                html += `
+                    <div class="multi-select-item">
+                        <input type="checkbox" value="${company.name.replace(/'/g, "&apos;")}" id="chk_${company.name.replace(/[^a-zA-Z0-9]/g, '_')}">
+                        <label for="chk_${company.name.replace(/[^a-zA-Z0-9]/g, '_')}">${company.name} (${company.zone})</label>
+                    </div>`;
+            });
+            container.innerHTML = html;
+        }
+
+        // إضافة الشركات المحددة لليوم
+        function addSelectedCompanies() {
+            const checkboxes = document.querySelectorAll('#multi-select-companies input[type=checkbox]:checked');
+            if (checkboxes.length === 0) {
+                alert('لم تختار أي شركة');
+                return;
+            }
+
+            const selected = [];
+            checkboxes.forEach(cb => {
+                selected.push(cb.value);
+            });
+
+            // إضافة الشركات المحددة إلى اليوم (بدون تكرار)
+            if (!db.weeklyPlan[currentAdminDay]) db.weeklyPlan[currentAdminDay] = [];
+            selected.forEach(name => {
+                if (!db.weeklyPlan[currentAdminDay].includes(name)) {
+                    db.weeklyPlan[currentAdminDay].push(name);
+                }
+            });
+
+            localStorage.setItem('PHYSIO_V44', JSON.stringify(db));
+            renderAdminCompanyList();
+            renderMultiSelectCompanies();
+            refresh();
+        }
+
+        function removeCompanyFromDay(companyName) {
+            db.weeklyPlan[currentAdminDay] = db.weeklyPlan[currentAdminDay].filter(n => n !== companyName);
+            localStorage.setItem('PHYSIO_V44', JSON.stringify(db));
+            renderAdminCompanyList();
+            renderMultiSelectCompanies();
+            refresh();
+        }
+
+        // دوال أخرى
         function closeModal() { document.getElementById('details-modal').style.display = 'none'; }
         function moveMonth(n) { viewM.setMonth(viewM.getMonth()+n); refresh(); }
-        function tab(id, el) { document.querySelectorAll('.page').forEach(p => p.classList.remove('active')); document.getElementById(id).classList.add('active'); document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active')); el.classList.add('active'); }
+        function tab(id, el) { 
+            document.querySelectorAll('.page').forEach(p => p.classList.remove('active')); 
+            document.getElementById(id).classList.add('active'); 
+            document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active')); 
+            el.classList.add('active'); 
+        }
         function checkNewZone(sel) { if(sel.value === "NEW") { const n = prompt("اسم المنطقة الجديدة:"); if(n) { db.zones.push(n); refresh(); sel.value = n; } else sel.selectedIndex = 0; } }
         function toggleDrop() { document.getElementById("reportDrop").classList.toggle("show"); }
         function exportData() { const blob = new Blob([JSON.stringify(db)], {type:"application/json"}); const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = `Physio_Backup_${new Date().toLocaleDateString()}.json`; a.click(); }
-        function importData(e) { const r = new FileReader(); r.onload = ev => { try { db = JSON.parse(ev.target.result); refresh(); alert("تم استيراد البيانات بنجاح ✅"); } catch(err) { alert("خطأ في ملف الاستيراد"); } }; r.readAsText(e.target.files[0]); }
+        function importData(e) { const r = new FileReader(); r.onload = ev => { try { db = JSON.parse(ev.target.result); 
+            db.companies = db.companies.map(c => { if (!c.plannedDays) c.plannedDays = []; if (!c.notes) c.notes = ""; if (!c.persons) c.persons = []; return c; });
+            if (!db.weeklyPlan) db.weeklyPlan = [[], [], [], [], []];
+            refresh(); alert("تم استيراد البيانات بنجاح ✅"); } catch(err) { alert("خطأ في ملف الاستيراد"); } }; r.readAsText(e.target.files[0]); }
     </script>
 </body>
 </html>

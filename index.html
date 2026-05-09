@@ -3,6 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="description" content="نظام فيزيو مصر لإدارة زيارات التسويق - تتبع الزيارات والشركات والتقارير">
+    <meta name="theme-color" content="#023652">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <title>Physio Masr Elite V60</title>
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;900&display=swap" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
@@ -10,7 +14,10 @@
     <script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>
     <style>
         :root { --navy: #023652; --teal: #1cb5b5; --bg: #f4f7f9; --card: #ffffff; --border: #e2e8f0; --neon-glow: 0 0 15px rgba(28, 181, 181, 0.6); --red: #ff4757; }
-        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; outline: none; }
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        *:focus { outline: 2px solid var(--teal); outline-offset: 2px; }
+        *:focus:not(:focus-visible) { outline: none; }
+        html { scroll-behavior: smooth; }
         body { font-family: 'Cairo', sans-serif; background: var(--bg); margin: 0; color: #2d3748; padding-bottom: 100px; overflow-x: hidden; }
 
         #splash-screen { position: fixed; inset: 0; background: var(--navy); z-index: 9999; display: none; flex-direction: column; align-items: center; justify-content: center; opacity: 1; transition: opacity 0.5s ease; }
@@ -118,6 +125,32 @@
         }
         .btn-neon:active {
             transform: translateY(0);
+        }
+        .btn-neon:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+        .btn-neon.loading {
+            position: relative;
+            color: transparent;
+        }
+        .btn-neon.loading::after {
+            content: '';
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            top: 50%;
+            left: 50%;
+            margin-left: -10px;
+            margin-top: -10px;
+            border: 3px solid rgba(255,255,255,0.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 0.8s linear infinite;
+        }
+        @keyframes spin {
+            to { transform: rotate(360deg); }
         }
         .btn-small { 
             background: var(--teal); 
@@ -229,6 +262,40 @@
         .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
         .modal-header h3 { margin: 0; color: var(--navy); }
 
+        /* Toast notifications */
+        .toast-container {
+            position: fixed;
+            top: 100px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 10000;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            width: 90%;
+            max-width: 350px;
+        }
+        .toast {
+            background: var(--navy);
+            color: white;
+            padding: 14px 20px;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            animation: slideDown 0.3s ease;
+            font-weight: bold;
+            font-size: 14px;
+        }
+        .toast.success { border-right: 4px solid #22c55e; }
+        .toast.error { border-right: 4px solid var(--red); }
+        .toast.warning { border-right: 4px solid #f59e0b; }
+        @keyframes slideDown {
+            from { opacity: 0; transform: translateX(-50%) translateY(-20px); }
+            to { opacity: 1; transform: translateX(-50%) translateY(0); }
+        }
+        
         /* ===== تطويرات V60 ===== */
 
         /* صفحة التقارير */
@@ -289,20 +356,24 @@
 </head>
 <body>
 
-    <div id="splash-screen">
-        <img src="https://j.top4top.io/p_3692l51ap0.png" class="pulse-logo">
+    <div id="toast-container" class="toast-container" aria-live="polite"></div>
+
+    <div id="splash-screen" role="alert" aria-live="polite">
+        <img src="https://j.top4top.io/p_3692l51ap0.png" class="pulse-logo" alt="شعار فيزيو مصر">
         <div id="splash-user-text" class="welcome-text"></div>
     </div>
 
-    <div id="login-screen" style="position:fixed; inset:0; background:var(--navy); z-index:9000; display:none; flex-direction:column; align-items:center; justify-content:center; padding:20px;">
-        <img src="https://j.top4top.io/p_3692l51ap0.png" style="width:200px; margin-bottom:40px;">
-        <input type="text" id="user-input" class="input" placeholder="ادخل اسم موظف التسويق" style="max-width:300px; text-align:center;">
+    <div id="login-screen" style="position:fixed; inset:0; background:var(--navy); z-index:9000; display:none; flex-direction:column; align-items:center; justify-content:center; padding:20px;" role="dialog" aria-labelledby="login-title">
+        <img src="https://j.top4top.io/p_3692l51ap0.png" style="width:200px; margin-bottom:40px;" alt="شعار فيزيو مصر">
+        <h2 id="login-title" style="color:white; margin-bottom:20px; font-size:18px;">مرحباً بك في فيزيو مصر</h2>
+        <label for="user-input" style="color:white; margin-bottom:8px; font-size:14px;">اسم موظف التسويق</label>
+        <input type="text" id="user-input" class="input" placeholder="ادخل اسم موظف التسويق" style="max-width:300px; text-align:center;" autocomplete="name" required>
         <button onclick="firstTimeLogin()" class="btn-neon" style="max-width:300px;">دخول للتطبيق</button>
     </div>
 
-    <header id="app-header" style="display:none;">
-        <div id="user-display" class="user-tag" onclick="toggleHub(true)"></div>
-        <img src="https://j.top4top.io/p_3692l51ap0.png" class="header-logo">
+    <header id="app-header" style="display:none;" role="banner">
+        <div id="user-display" class="user-tag" onclick="toggleHub(true)" role="button" tabindex="0" aria-label="فتح لوحة الإحصائيات"></div>
+        <img src="https://j.top4top.io/p_3692l51ap0.png" class="header-logo" alt="فيزيو مصر">
     </header>
 
     <!-- لوحة الإحصائيات الذكية (Hub) -->
@@ -437,7 +508,7 @@
                 <button onclick="document.getElementById('imp-f').click()" style="padding:10px; border-radius:10px; border:1px solid #ddd; background:white; font-size:12px; font-weight:bold;">استيراد بيانات</button>
                 <input type="file" id="imp-f" style="display:none" onchange="importData(event)">
             </div>
-            <input type="text" id="comp-search" class="input" placeholder="بحث باسم الشركة أو المنطقة..." oninput="renderComps()">
+            <input type="text" id="comp-search" class="input" placeholder="بحث باسم الشركة أو المنطقة..." oninput="debounceSearch()" aria-label="البحث في الشركات">
             <div id="company-list" class="company-list-scroll"></div>
         </div>
 
@@ -581,11 +652,11 @@
         </div>
     </div>
 
-    <nav id="app-nav" style="display:none;">
-        <div class="nav-link active" onclick="tab('p-home', this)"><svg class="icon" viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>الرئيسية</div>
-        <div class="nav-link" onclick="tab('p-add', this); getLocation();"><svg class="icon" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>إضافة شركة</div>
-        <div class="nav-link" onclick="tab('p-data', this)"><svg class="icon" viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20M4 19.5A2.5 2.5 0 0 0 6.5 22H20M4 19.5V3A2.5 2.5 0 0 1 6.5 0.5H20v16.5H6.5a2.5 2.5 0 0 0-2.5 3z"/></svg>البيانات</div>
-        <div class="nav-link" onclick="tab('p-reports', this); renderReportsPage();"><svg class="icon" viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>تقارير</div>
+    <nav id="app-nav" style="display:none;" role="navigation" aria-label="التنقل الرئيسي">
+        <div class="nav-link active" onclick="tab('p-home', this)" role="button" tabindex="0" aria-label="الصفحة الرئيسية"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>الرئيسية</div>
+        <div class="nav-link" onclick="tab('p-add', this); getLocation();" role="button" tabindex="0" aria-label="إضافة شركة جديدة"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>إضافة شركة</div>
+        <div class="nav-link" onclick="tab('p-data', this)" role="button" tabindex="0" aria-label="عرض البيانات"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20M4 4.5A2.5 2.5 0 0 1 6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15z"/></svg>البيانات</div>
+        <div class="nav-link" onclick="tab('p-reports', this); renderReportsPage();" role="button" tabindex="0" aria-label="التقارير والإحصائيات"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>تقارير</div>
     </nav>
 
     <script>
@@ -604,6 +675,29 @@
         // متغيرات للتعامل مع اللمس في صفحة البيانات
         let touchStartX = 0, touchStartY = 0;
         let touchMoved = false;
+        let searchTimeout = null;
+        
+        // دالة البحث مع تأخير للأداء
+        function debounceSearch() {
+            if (searchTimeout) clearTimeout(searchTimeout);
+            searchTimeout = setTimeout(() => renderComps(), 200);
+        }
+        
+        // دالة إظهار الإشعارات
+        function showToast(message, type = 'success', duration = 3000) {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+            const icon = type === 'success' ? '✓' : type === 'error' ? '✕' : '⚠';
+            toast.innerHTML = `<span>${icon}</span><span>${message}</span>`;
+            container.appendChild(toast);
+            setTimeout(() => {
+                toast.style.opacity = '0';
+                toast.style.transform = 'translateY(-20px)';
+                toast.style.transition = 'all 0.3s ease';
+                setTimeout(() => toast.remove(), 300);
+            }, duration);
+        }
 
         // أسماء أيام الأسبوع بالعربية
         const dayNames = ["الأحد", "الإثنين", "الثلاثاء", "الأربعاء", "الخميس"];
@@ -707,7 +801,27 @@
             });
         }
 
-        function firstTimeLogin() { const u = document.getElementById('user-input').value.trim(); if(u){ db.user=u; refresh(); runSplash(); } }
+        function firstTimeLogin() { const u = document.getElementById('user-input').value.trim(); if(u){ db.user=u; refresh(); runSplash(); } else { alert('يرجى إدخال اسمك'); } }
+        
+        // دعم لوحة المفاتيح للدخول
+        document.addEventListener('DOMContentLoaded', function() {
+            const userInput = document.getElementById('user-input');
+            if (userInput) {
+                userInput.addEventListener('keypress', function(e) {
+                    if (e.key === 'Enter') firstTimeLogin();
+                });
+            }
+            
+            // دعم لوحة المفاتيح للتنقل
+            document.querySelectorAll('.nav-link').forEach(link => {
+                link.addEventListener('keypress', function(e) {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault();
+                        this.click();
+                    }
+                });
+            });
+        });
         function runSplash() { 
             document.getElementById('login-screen').style.display = 'none'; 
             const s = document.getElementById('splash-screen'); 
@@ -869,7 +983,7 @@
                 localStorage.setItem('PHYSIO_V50', JSON.stringify(db));
                 refresh();
                 closeVisitModal();
-                alert('تم حفظ الزيارة بنجاح ✅');
+                showToast('تم حفظ الزيارة بنجاح', 'success');
             } catch(err) {
                 console.log("[v0] Save Visit Error:", err);
                 alert('حدث خطأ أثناء حفظ الزيارة');
@@ -928,7 +1042,7 @@
                 document.querySelectorAll('#plan-days-checkboxes input[type=checkbox]').forEach(cb => cb.checked = false);
 
                 refresh(); 
-                alert("تم إضافة الشركة بنجاح ✅");
+                showToast('تم إضافة الشركة بنجاح', 'success');
                 tab('p-home', document.querySelectorAll('.nav-link')[0]);
             } catch(err) {
                 console.log("[v0] Save Company Error:", err);
@@ -1098,7 +1212,7 @@
             container.appendChild(div);
         }
 
-        // دالة حذف مسؤول من نافذة التعديل
+        // دالة حذف مسؤول من نافذة التعد��ل
         function removePersonFromEdit(btn) {
             if (confirm('هل أنت متأكد من حذف هذا المسؤول؟')) {
                 const row = btn.closest('.person-edit-row');
@@ -1129,7 +1243,7 @@
                     localStorage.setItem('PHYSIO_V50', JSON.stringify(db));
                     closeEditFullModal();
                     refresh();
-                    alert(`تم حذف الشركة "${companyName}" بنجاح ✅`);
+                    showToast(`تم حذف الشركة "${companyName}" بنجاح`, 'success');
                 }
             } catch(err) {
                 console.log("[v0] Delete Company Error:", err);
@@ -1183,7 +1297,7 @@
                     
                     refresh();
                     closeEditFullModal();
-                    alert('تم تحديث الشركة بنجاح ✅');
+                    showToast('تم تحديث الشركة بنجاح', 'success');
                 } else {
                     alert('خطأ: لم يتم العثور على الشركة');
                 }
@@ -1338,7 +1452,7 @@
                     filename: `${fileName}.pdf`,
                     image: { type: 'jpeg', quality: 1 },
                     html2canvas: { 
-                        scale: 2.5,          // دقة عالية
+                        scale: 2.5,          // دقة عالي��
                         useCORS: true, 
                         letterRendering: true,
                         logging: false,
@@ -1603,7 +1717,7 @@
                 a.href = URL.createObjectURL(blob); 
                 a.download = `Physio_Backup_${new Date().toLocaleDateString()}.json`; 
                 a.click();
-                alert("تم تصدير البيانات بنجاح ✅");
+                showToast('تم تصدير البيانات بنجاح', 'success');
             } catch(err) {
                 console.log("[v0] Export Data Error:", err);
                 alert("حدث خطأ أثناء تصدير البيانات");
@@ -1638,7 +1752,7 @@
                         cleanWeeklyPlan(); // تنظيف البيانات بعد الاستيراد
                         localStorage.setItem('PHYSIO_V50', JSON.stringify(db));
                         refresh(); 
-                        alert("تم استيراد البيانات بنجاح ✅"); 
+                        showToast('تم استيراد البيانات بنجاح', 'success'); 
                     } catch(err) {
                         console.log("[v0] Import Parse Error:", err);
                         alert("خطأ في صيغة الملف. تأكد من أنك تستخدم ملف نسخة احتياطية صحيح."); 

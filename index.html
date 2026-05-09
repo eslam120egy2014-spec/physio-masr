@@ -228,6 +228,10 @@
 
         /* تحسين التمرير في صفحة البيانات */
         .company-list-scroll { max-height: 70vh; overflow-y: auto; padding-left: 5px; -webkit-overflow-scrolling: touch; }
+        .planned-company-item { cursor: pointer; transition: transform 0.2s, box-shadow 0.2s; user-select: none; }
+        .planned-company-item:active { transform: scale(0.98); box-shadow: 0 2px 8px rgba(0,0,0,0.15); }
+        .company-item { cursor: pointer; transition: transform 0.2s; user-select: none; }
+        .company-item:active { transform: scale(0.98); }
 
         /* تنسيق قائمة الاختيار المتعدد في التحكم */
         .multi-select-list { max-height: 250px; overflow-y: auto; border: 1px solid var(--border); border-radius: 12px; padding: 10px; margin: 10px 0; background: #f9f9f9; }
@@ -390,7 +394,7 @@
             <div class="hub-tab" onclick="switchHubTab('control')">🛠️ التحكم</div>
         </div>
         <div class="hub-content">
-            <!-- محتوى تبويب الإحصائيات -->
+            <!-- محتوى تبويب الإحص��ئيات -->
             <div id="hub-stats" class="hub-tab-content active">
                 <div class="stat-grid">
                     <div class="stat-box"><span id="st-visits" class="stat-val">0</span><span class="stat-lbl">زيارات هذا الشهر</span></div>
@@ -903,17 +907,24 @@
                     ).join('') + '</div>';
                 }
                 html += `
-                    <div class="card" style="border-right:5px solid var(--teal);">
-                        <div style="display:flex; justify-content:space-between; align-items:center;" onclick="openVisitModal('${company.name.replace(/'/g, "\\'")}')">
+                    <div class="card planned-company-item" data-name="${company.name.replace(/'/g, "\\'")}" style="border-right:5px solid var(--teal);">
+                        <div style="display:flex; justify-content:space-between; align-items:center;">
                             <div><b>${company.name}</b><br><small>📍 ${company.zone}</small></div>
+                            <small style="color:#888; font-size:10px;">اضغط مطولاً للتعديل</small>
                         </div>
                         ${personsHtml}
                         <div style="margin-top:8px; text-align:left;">
-                            <button class="add-person-btn" onclick="openAddPersonModal('${company.name.replace(/'/g, "\\'")}')">➕</button>
+                            <button class="add-person-btn" onclick="event.stopPropagation(); openAddPersonModal('${company.name.replace(/'/g, "\\'")}')">➕</button>
                         </div>
                     </div>`;
             });
             document.getElementById('planned-visits').innerHTML = html;
+            
+            // إضافة مستمعات اللمس للضغط المطول على كل شركة
+            document.querySelectorAll('.planned-company-item').forEach(item => {
+                const name = item.getAttribute('data-name');
+                attachPlannedCompanyTouchEvents(item, name);
+            });
         }
 
         // فتح مودال إضافة مسؤول
@@ -1050,7 +1061,7 @@
             }
         }
 
-        // عرض الشركات في صفحة البيانات (مع تحسين اللمس)
+        // عرض الشركات في صفحة البيانات (م�� تحسين اللمس)
         function renderComps() { 
             const s = document.getElementById('comp-search').value.toLowerCase(); 
             const f = db.companies.filter(c => c.name.toLowerCase().includes(s) || c.zone.toLowerCase().includes(s)); 
@@ -1167,6 +1178,100 @@
         // الضغط المطول (تم تضمينه أعلاه، ولكن نحتاج الدوال القديمة أيضاً)
         function startLongPress(name) { /* لن نستخدمها بعد الآن */ }
         function endLongPress(name) { /* لن نستخدمها بعد الآن */ }
+        
+        // دوال اللمس للشركات في صفحة الخطة اليومية (الرئيسية)
+        function attachPlannedCompanyTouchEvents(element, companyName) {
+            let touchStartTime;
+            let touchStartX, touchStartY;
+            let mouseStartX = 0, mouseStartY = 0;
+            let longPressTriggered = false;
+            let localPressTimer = null;
+
+            element.addEventListener('touchstart', (e) => {
+                touchStartTime = Date.now();
+                touchStartX = e.touches[0].clientX;
+                touchStartY = e.touches[0].clientY;
+                touchMoved = false;
+                longPressTriggered = false;
+
+                localPressTimer = setTimeout(() => {
+                    longPressTriggered = true;
+                    // اهتزاز خفيف للإشعار (إذا كان مدعوماً)
+                    if (navigator.vibrate) navigator.vibrate(50);
+                    openFullEdit(companyName);
+                }, 600);
+            }, { passive: true });
+
+            element.addEventListener('touchmove', (e) => {
+                if (!touchStartX || !touchStartY) return;
+                const dx = Math.abs(e.touches[0].clientX - touchStartX);
+                const dy = Math.abs(e.touches[0].clientY - touchStartY);
+                if (dx > 10 || dy > 10) {
+                    touchMoved = true;
+                    if (localPressTimer) {
+                        clearTimeout(localPressTimer);
+                        localPressTimer = null;
+                    }
+                }
+            }, { passive: true });
+
+            element.addEventListener('touchend', (e) => {
+                if (localPressTimer) {
+                    clearTimeout(localPressTimer);
+                    localPressTimer = null;
+                }
+                const touchEndTime = Date.now();
+                const touchDuration = touchEndTime - touchStartTime;
+
+                // نقرة قصيرة = فتح مودال الزيارة
+                if (!touchMoved && touchDuration < 300 && !longPressTriggered) {
+                    openVisitModal(companyName);
+                }
+            });
+
+            // دعم الماوس (للاختبار على الكمبيوتر)
+            element.addEventListener('mousedown', (e) => {
+                if (e.target.tagName === 'BUTTON') return; // تجاهل الضغط على الأزرار
+                touchStartTime = Date.now();
+                mouseStartX = e.clientX;
+                mouseStartY = e.clientY;
+                touchMoved = false;
+                longPressTriggered = false;
+                localPressTimer = setTimeout(() => {
+                    longPressTriggered = true;
+                    openFullEdit(companyName);
+                }, 600);
+            });
+
+            element.addEventListener('mousemove', (e) => {
+                const dx = Math.abs(e.clientX - mouseStartX);
+                const dy = Math.abs(e.clientY - mouseStartY);
+                if ((dx > 10 || dy > 10) && localPressTimer) {
+                    clearTimeout(localPressTimer);
+                    localPressTimer = null;
+                    touchMoved = true;
+                }
+            });
+
+            element.addEventListener('mouseup', (e) => {
+                if (localPressTimer) {
+                    clearTimeout(localPressTimer);
+                    localPressTimer = null;
+                }
+                const mouseUpTime = Date.now();
+                const duration = mouseUpTime - touchStartTime;
+                if (!touchMoved && duration < 300 && !longPressTriggered && e.target.tagName !== 'BUTTON') {
+                    openVisitModal(companyName);
+                }
+            });
+
+            element.addEventListener('mouseleave', () => {
+                if (localPressTimer) {
+                    clearTimeout(localPressTimer);
+                    localPressTimer = null;
+                }
+            });
+        }
 
         // فتح التعديل الشامل (ضغط مطول)
         function openFullEdit(name) {

@@ -30,6 +30,27 @@
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
         .card { background: var(--card); padding: 20px; border-radius: 18px; margin-bottom: 15px; border: 1px solid var(--border); box-shadow: 0 4px 6px rgba(0,0,0,0.02); }
+        
+        /* Professional Report Styling */
+        .report-section {
+            background: linear-gradient(135deg, #ffffff 0%, #f9fafb 100%);
+            border: 1.5px solid var(--border);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+            transition: all 0.3s ease;
+        }
+        .report-section:hover {
+            box-shadow: 0 8px 16px rgba(0,0,0,0.08);
+            border-color: var(--teal);
+        }
+        .report-title {
+            font-size: 16px;
+            font-weight: 800;
+            color: var(--navy);
+            margin-bottom: 18px;
+            padding-bottom: 12px;
+            border-bottom: 2px solid var(--teal);
+            letter-spacing: -0.3px;
+        }
         label { display: flex; align-items: center; gap: 10px; font-size: 14px; font-weight: 700; color: var(--navy); margin-bottom: 10px; }
         .label-icon { width: 18px; height: 18px; color: var(--teal); stroke-width: 2.5; fill: none; stroke: currentColor; }
         .icon { width: 22px; height: 22px; stroke: currentColor; stroke-width: 2; fill: none; }
@@ -155,6 +176,31 @@
         .delete-btn:hover {
             opacity: 0.9;
         }
+        
+        /* Professional Report Data Cards */
+        .company-card, .zone-card, .stat-card {
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            border-radius: 14px;
+            padding: 16px;
+            margin-bottom: 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: all 0.2s ease;
+        }
+        .company-card:hover, .zone-card:hover, .stat-card:hover {
+            border-color: var(--teal);
+            box-shadow: 0 4px 12px rgba(28, 181, 181, 0.1);
+        }
+        .card-info { flex: 1; }
+        .card-label { font-size: 12px; color: #718096; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
+        .card-value { font-size: 18px; font-weight: 800; color: var(--navy); margin-top: 4px; }
+        .card-meta { font-size: 11px; color: #cbd5e0; margin-top: 6px; }
+        .card-badge { background: #edf2f7; color: var(--navy); padding: 6px 12px; border-radius: 8px; font-size: 12px; font-weight: 700; }
+        .card-badge.high { background: #fef3c7; color: #92400e; }
+        .card-badge.medium { background: #cffafe; color: #164e63; }
+        .card-badge.low { background: #dbeafe; color: #1e40af; }
         
         #employee-hub { position: fixed; inset: 0; background: var(--bg); z-index: 4000; display: none; flex-direction: column; animation: slideUp 0.4s ease-out; }
         @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
@@ -582,7 +628,7 @@
     </div>
 
     <nav id="app-nav" style="display:none;">
-        <div class="nav-link active" onclick="tab('p-home', this)"><svg class="icon" viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>الرئيسية</div>
+        <div class="nav-link active" onclick="tab('p-home', this)"><svg class="icon" viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>الرئي��ية</div>
         <div class="nav-link" onclick="tab('p-add', this); getLocation();"><svg class="icon" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>إضافة شركة</div>
         <div class="nav-link" onclick="tab('p-data', this)"><svg class="icon" viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20M4 19.5A2.5 2.5 0 0 0 6.5 22H20M4 19.5V3A2.5 2.5 0 0 1 6.5 0.5H20v16.5H6.5a2.5 2.5 0 0 0-2.5 3z"/></svg>البيانات</div>
         <div class="nav-link" onclick="tab('p-reports', this); renderReportsPage();"><svg class="icon" viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>تقارير</div>
@@ -1098,7 +1144,7 @@
             container.appendChild(div);
         }
 
-        // دالة حذف مسؤول من نافذة التعد��ل
+        // دالة حذف مسؤول من نافذة الت��د��ل
         function removePersonFromEdit(btn) {
             if (confirm('هل أنت متأكد من حذف هذا المسؤول؟')) {
                 const row = btn.closest('.person-edit-row');
@@ -1338,7 +1384,7 @@
                     filename: `${fileName}.pdf`,
                     image: { type: 'jpeg', quality: 1 },
                     html2canvas: { 
-                        scale: 2.5,          // دقة عالية
+                        scale: 2.5,          // دقة ��الية
                         useCORS: true, 
                         letterRendering: true,
                         logging: false,
@@ -1665,7 +1711,7 @@
                 const input = document.getElementById('edit-product-input');
                 const val = input.value.trim();
                 if (!val) return alert('يرجى إدخال اسم المنتج أو العرض');
-                if (val.length > 50) return alert('اسم المنتج طويل جداً');
+                if (val.length > 50) return alert('اسم المنتج طويل جدا��');
                 
                 const name = document.getElementById('edit-original-name').value;
                 const c = db.companies.find(co => co.name === name);
@@ -1812,15 +1858,24 @@
             document.getElementById('top-companies-list').innerHTML = sorted.map(([name, cnt], i) => {
                 const c = db.companies.find(co => co.name === name) || {};
                 const fillPct = Math.round((cnt / maxCnt) * 100);
+                const rankIcon = ['🥇', '🥈', '🥉'][i] || '⭐';
+                const badgeClass = i === 0 ? 'high' : i === 1 ? 'medium' : 'low';
                 return `
-                    <div class="top-company-row">
-                        <div class="top-company-rank ${rankClasses[i] || ''}">${i+1}</div>
-                        <div class="top-company-info">
-                            <b style="font-size:13px;">${name}</b>
-                            <small style="color:#888; display:block;">📍 ${c.zone || ''} • ${cnt} زيارة</small>
-                            <div class="top-company-bar"><div class="top-company-fill" style="width:${fillPct}%"></div></div>
+                    <div class="company-card">
+                        <div class="card-info">
+                            <div style="display:flex; align-items:center; gap:10px; margin-bottom:8px;">
+                                <span style="font-size:24px;">${rankIcon}</span>
+                                <div>
+                                    <div class="card-label" style="margin:0;">الترتيب ${i+1}</div>
+                                    <div class="card-value" style="margin:0;">${name}</div>
+                                </div>
+                            </div>
+                            <div class="card-meta">📍 ${c.zone || 'غير محدد'}</div>
+                            <div style="height:6px; background:#e2e8f0; border-radius:3px; margin-top:10px; overflow:hidden;">
+                                <div style="height:100%; background:var(--teal); width:${fillPct}%; transition:width 0.3s ease;"></div>
+                            </div>
                         </div>
-                        <span style="font-size:20px; font-weight:900; color:var(--teal);">${cnt}</span>
+                        <span class="card-badge ${badgeClass}" style="white-space:nowrap; margin-right:12px;">${cnt} زيارة</span>
                     </div>`;
             }).join('');
         }
@@ -1846,13 +1901,21 @@
                     badgeClass = 'ok';
                     badgeText = `${r.daysSince} يوم`;
                 }
+                const icon = r.daysSince >= 30 || r.daysSince === 9999 ? '🔴' : r.daysSince >= 14 ? '🟠' : '🟢';
+                const bgColor = r.daysSince >= 30 || r.daysSince === 9999 ? '#fef2f2' : r.daysSince >= 14 ? '#fffbf0' : '#f0fdf4';
                 return `
-                    <div class="unvisited-item">
-                        <div>
-                            <b style="font-size:13px;">${r.name}</b>
-                            <small style="color:#888; display:block;">📍 ${r.zone}</small>
+                    <div class="company-card" style="background:${bgColor}; border-color:${badgeClass === 'danger' ? '#fca5a5' : badgeClass === 'warning' ? '#fed7aa' : '#bbf7d0'};">
+                        <div class="card-info">
+                            <div style="display:flex; align-items:center; gap:10px; margin-bottom:8px;">
+                                <span style="font-size:20px;">${icon}</span>
+                                <div style="flex:1;">
+                                    <div class="card-label" style="margin:0;">آخر زيارة</div>
+                                    <div class="card-value" style="margin:0; font-size:16px;">${r.name}</div>
+                                </div>
+                            </div>
+                            <div class="card-meta">📍 ${r.zone || 'غير محدد'}</div>
                         </div>
-                        <span class="unvisited-badge ${badgeClass}">${badgeText}</span>
+                        <span class="card-badge ${badgeClass === 'danger' ? 'high' : badgeClass === 'warning' ? 'medium' : 'low'}" style="white-space:nowrap; margin-right:12px;">${badgeText}</span>
                     </div>`;
             }).join('');
         }
@@ -1878,16 +1941,26 @@
                 return;
             }
 
-            document.getElementById('zones-report-list').innerHTML = sorted.map(([zone, cnt]) => {
+            document.getElementById('zones-report-list').innerHTML = sorted.map(([zone, cnt], i) => {
                 const fillPct = Math.round((cnt / maxCnt) * 100);
+                const colors = ['#0ea5e9', '#14b8a6', '#f59e0b', '#ef4444', '#8b5cf6'];
+                const color = colors[i % colors.length];
                 return `
-                    <div style="margin-bottom:12px;">
-                        <div style="display:flex; justify-content:space-between; font-size:13px; font-weight:bold; margin-bottom:4px;">
-                            <span>📍 ${zone}</span><span style="color:var(--teal);">${cnt} زيارة</span>
+                    <div class="zone-card">
+                        <div class="card-info">
+                            <div style="display:flex; align-items:center; gap:10px; margin-bottom:10px;">
+                                <div style="width:12px; height:12px; border-radius:6px; background:${color};"></div>
+                                <div style="flex:1;">
+                                    <div class="card-label" style="margin:0;">منطقة</div>
+                                    <div class="card-value" style="margin:0; font-size:15px;">${zone || 'غير محدد'}</div>
+                                </div>
+                            </div>
+                            <div style="height:6px; background:#e2e8f0; border-radius:3px; overflow:hidden; margin-bottom:8px;">
+                                <div style="width:${fillPct}%; height:100%; background:${color}; border-radius:3px; transition:width 0.4s ease;"></div>
+                            </div>
+                            <div style="font-size:11px; color:#718096; font-weight:600;">الإنجاز: ${fillPct}%</div>
                         </div>
-                        <div style="height:8px; background:#f0f7fa; border-radius:4px; overflow:hidden;">
-                            <div style="width:${fillPct}%; height:100%; background:var(--teal); border-radius:4px; transition:width 0.8s ease;"></div>
-                        </div>
+                        <span class="card-badge" style="background:${color}22; color:${color}; font-weight:800; white-space:nowrap; margin-right:12px;">${cnt}</span>
                     </div>`;
             }).join('');
         }

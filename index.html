@@ -13,11 +13,12 @@
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; outline: none; }
         body { font-family: 'Cairo', sans-serif; background: var(--bg); margin: 0; color: #2d3748; padding-bottom: 100px; overflow-x: hidden; }
 
-        #splash-screen { position: fixed; inset: 0; background: var(--navy); z-index: 9999; display: none; flex-direction: column; align-items: center; justify-content: center; }
+        #splash-screen { position: fixed; inset: 0; background: var(--navy); z-index: 9999; display: none; flex-direction: column; align-items: center; justify-content: center; opacity: 1; transition: opacity 0.5s ease; }
         .pulse-logo { width: 180px; height: auto; animation: pulse-anim 2s infinite ease-in-out; }
         .welcome-text { margin-top: 15px; color: var(--teal); font-size: 24px; font-weight: 900; opacity: 0; animation: fadeInUp 0.8s forwards 0.5s; }
         @keyframes pulse-anim { 0%, 100% { transform: scale(0.95); opacity: 0.9; } 50% { transform: scale(1.02); opacity: 1; } }
         @keyframes fadeInUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes slideIn { from { transform: translateX(-100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
 
         header { background: var(--navy); height: 90px; display: grid; grid-template-columns: 1fr auto; align-items: center; padding: 0 20px; border-bottom: 3px solid var(--teal); position: sticky; top: 0; z-index: 1000; }
         .header-logo { height: 60px; width: auto; justify-self: end; }
@@ -33,7 +34,24 @@
         .label-icon { width: 18px; height: 18px; color: var(--teal); stroke-width: 2.5; fill: none; stroke: currentColor; }
         .icon { width: 22px; height: 22px; stroke: currentColor; stroke-width: 2; fill: none; }
 
-        .input, select, textarea { width: 100%; padding: 12px 15px; border-radius: 12px; border: 1.5px solid var(--border); font-size: 14px; font-family: inherit; margin-bottom: 12px; }
+        .input, select, textarea { 
+            width: 100%; 
+            padding: 12px 15px; 
+            border-radius: 12px; 
+            border: 1.5px solid var(--border); 
+            font-size: 14px; 
+            font-family: inherit; 
+            margin-bottom: 12px;
+            transition: all 0.3s ease;
+        }
+        .input:focus, select:focus, textarea:focus {
+            border-color: var(--teal);
+            box-shadow: 0 0 0 3px rgba(28, 181, 181, 0.1);
+            outline: none;
+        }
+        .input::placeholder {
+            color: #aaa;
+        }
         
         .dropdown { position: relative; display: inline-block; }
         .dropdown-content { display: none; position: absolute; left: 0; background: white; min-width: 160px; box-shadow: 0 8px 16px rgba(0,0,0,0.1); border-radius: 12px; z-index: 2005; border: 1px solid var(--border); overflow: hidden; }
@@ -43,16 +61,79 @@
         .cal-head { background: var(--navy); color: white; padding: 18px; display: flex; justify-content: space-between; align-items: center; border-radius: 18px 18px 0 0; }
         .nav-btn { background: rgba(255,255,255,0.1); border: none; padding: 8px; border-radius: 10px; color: var(--teal); cursor: pointer; }
         .cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); background: white; padding: 12px; border-radius: 0 0 18px 18px; border: 1px solid var(--border); text-align: center; }
-        .day { height: 42px; display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 700; cursor: pointer; border-radius: 10px; position: relative; }
-        .day.selected { background: var(--teal); color: white; box-shadow: var(--neon-glow); transform: scale(1.1); z-index: 2; }
-        .day.has-v::after { content: ''; position: absolute; bottom: 5px; width: 5px; height: 5px; background: #f59e0b; border-radius: 50%; }
+        .day { 
+            height: 42px; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            font-size: 14px; 
+            font-weight: 700; 
+            cursor: pointer; 
+            border-radius: 10px; 
+            position: relative;
+            transition: all 0.2s ease;
+            color: #2d3748;
+        }
+        .day:hover {
+            background: #f0f7fa;
+        }
+        .day.selected { 
+            background: var(--teal); 
+            color: white; 
+            box-shadow: var(--neon-glow); 
+            transform: scale(1.15); 
+            z-index: 2; 
+        }
+        .day.has-v::after { 
+            content: ''; 
+            position: absolute; 
+            bottom: 5px; 
+            width: 6px; 
+            height: 6px; 
+            background: #f59e0b; 
+            border-radius: 50%;
+            box-shadow: 0 0 3px #f59e0b;
+        }
 
         nav { position: fixed; bottom: 0; left: 0; right: 0; background: white; height: 75px; display: flex; justify-content: space-around; align-items: center; border-top: 1px solid var(--border); z-index: 2000; }
         .nav-link { color: #94a3b8; text-decoration: none; font-size: 11px; font-weight: 700; display: flex; flex-direction: column; align-items: center; gap: 5px; cursor: pointer; }
         .nav-link.active { color: var(--teal); }
 
-        .btn-neon { background: var(--teal); color: white; border: none; padding: 16px; border-radius: 14px; font-weight: 900; width: 100%; box-shadow: var(--neon-glow); margin-top: 10px; cursor: pointer; }
-        .btn-small { background: var(--teal); color: white; border: none; padding: 5px 10px; border-radius: 8px; font-size: 12px; font-weight: bold; cursor: pointer; }
+        .btn-neon { 
+            background: var(--teal); 
+            color: white; 
+            border: none; 
+            padding: 16px; 
+            border-radius: 14px; 
+            font-weight: 900; 
+            width: 100%; 
+            box-shadow: var(--neon-glow); 
+            margin-top: 10px; 
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .btn-neon:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 0 20px rgba(28, 181, 181, 0.8);
+        }
+        .btn-neon:active {
+            transform: translateY(0);
+        }
+        .btn-small { 
+            background: var(--teal); 
+            color: white; 
+            border: none; 
+            padding: 5px 10px; 
+            border-radius: 8px; 
+            font-size: 12px; 
+            font-weight: bold; 
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        .btn-small:hover {
+            opacity: 0.9;
+            transform: scale(1.05);
+        }
         
         /* أزرار الإزالة النصية */
         .delete-btn {
@@ -531,24 +612,41 @@
         const preventDuplicateAcrossDays = true;
 
         window.onload = function() { 
-            // تنظيف البيانات من أي تكرارات سابقة
-            cleanWeeklyPlan();
+            try {
+                // التأكد من وجود جميع الخصائص الأساسية
+                if (!db.user) db.user = "";
+                if (!db.visits) db.visits = [];
+                if (!db.companies) db.companies = [];
+                if (!db.zones) db.zones = ["المعادي", "الدقي", "مدينة نصر", "المقطم", "حلوان", "العبور"];
+                if (!db.weeklyPlan) db.weeklyPlan = [[], [], [], [], []];
+                
+                // تنظيف البيانات من أي تكرارات سابقة
+                cleanWeeklyPlan();
 
-            // التأكد من وجود weeklyPlan
-            if (!db.weeklyPlan) db.weeklyPlan = [[], [], [], [], []];
-            // التأكد من أن كل شركة لديها حقل notes (اختياري)
-            db.companies = db.companies.map(c => {
-                if (!c.notes) c.notes = "";
-                if (!c.plannedDays) c.plannedDays = [];
-                if (!c.persons) c.persons = [];
-                if (!c.products) c.products = [];
-                return c;
-            });
+                // التأكد من أن كل شركة لديها جميع الحقول
+                db.companies = db.companies.map(c => {
+                    if (!c.notes) c.notes = "";
+                    if (!c.plannedDays) c.plannedDays = [];
+                    if (!c.persons) c.persons = [];
+                    if (!c.products) c.products = [];
+                    if (!c.zone) c.zone = "غير محدد";
+                    return c;
+                });
+                
+                // حفظ البيانات المصححة
+                localStorage.setItem('PHYSIO_V50', JSON.stringify(db));
 
-            if (!db.user) document.getElementById('login-screen').style.display = 'flex'; 
-            else runSplash(); 
-            if(!document.getElementById('persons-container').children.length) addPerson(); 
-            renderDayCheckboxes();
+                if (!db.user) document.getElementById('login-screen').style.display = 'flex'; 
+                else runSplash(); 
+                
+                const personsContainer = document.getElementById('persons-container');
+                if (personsContainer && !personsContainer.children.length) addPerson(); 
+                
+                renderDayCheckboxes();
+            } catch(err) {
+                console.log("[v0] Window OnLoad Error:", err);
+                alert("خطأ في تحميل البيانات. يرجى تحديث الصفحة.");
+            }
         };
 
         // دالة لتنظيف التكرارات في weeklyPlan
@@ -620,22 +718,43 @@
         function start() { document.getElementById('app-header').style.display='grid'; document.getElementById('app-content').style.display='block'; document.getElementById('app-nav').style.display='flex'; document.getElementById('user-display').innerText = db.user; refresh(); }
 
         function refresh() { 
-            localStorage.setItem('PHYSIO_V50', JSON.stringify(db)); 
-            renderCal(); 
-            renderVisits(); 
-            renderPlannedToday(); 
-            renderComps(); 
-            renderHubStats();
-            // تحديث قوائم المناطق
-            const zOpts = db.zones.map(z=>`<option>${z}</option>`).join('') + `<option value="NEW">+ منطقة جديدة</option>`;
-            document.getElementById('comp-zone').innerHTML = zOpts; 
-            document.getElementById('edit-zone').innerHTML = db.zones.map(z=>`<option>${z}</option>`).join('');
-            document.getElementById('comp-dl').innerHTML = db.companies.map(c=>`<option value="${c.name}">`).join(''); 
-            // إذا كان الهب مفتوحاً، نحدث محتوى التحكم
-            if (document.getElementById('employee-hub').style.display === 'flex') {
-                renderAdminTabs();
-                renderAdminCompanyList();
-                renderMultiSelectCompanies();
+            try {
+                // التأكد من وجود جميع الخصائص المطلوبة
+                if (!db.visits) db.visits = [];
+                if (!db.companies) db.companies = [];
+                if (!db.zones) db.zones = ["المعادي", "الدقي", "مدينة نصر", "المقطم", "حلوان", "العبور"];
+                if (!db.weeklyPlan) db.weeklyPlan = [[], [], [], [], []];
+                
+                // حفظ البيانات في localStorage
+                localStorage.setItem('PHYSIO_V50', JSON.stringify(db));
+                
+                // تحديث العناصر المرئية
+                renderCal(); 
+                renderVisits(); 
+                renderPlannedToday(); 
+                renderComps(); 
+                renderHubStats();
+                
+                // تحديث قوائم المناطق - مع معالجة الأخطاء
+                const zOpts = (db.zones || []).map(z=>`<option>${z}</option>`).join('') + `<option value="NEW">+ منطقة جديدة</option>`;
+                const zoneSelect = document.getElementById('comp-zone');
+                if (zoneSelect) zoneSelect.innerHTML = zOpts;
+                
+                const editZone = document.getElementById('edit-zone');
+                if (editZone) editZone.innerHTML = (db.zones || []).map(z=>`<option>${z}</option>`).join('');
+                
+                const compDl = document.getElementById('comp-dl');
+                if (compDl) compDl.innerHTML = (db.companies || []).map(c=>`<option value="${c.name}">`).join('');
+                
+                // إذا كان الهب مفتوحاً، نحدث محتوى التحكم
+                const hub = document.getElementById('employee-hub');
+                if (hub && hub.style.display === 'flex') {
+                    renderAdminTabs();
+                    renderAdminCompanyList();
+                    renderMultiSelectCompanies();
+                }
+            } catch(err) {
+                console.log("[v0] Refresh Error:", err);
             }
         }
 
@@ -729,54 +848,92 @@
 
         // حفظ الزيارة من المودال
         function saveVisitFromPlan() {
-            const company = document.getElementById('visit-modal-company').innerText;
-            const note = document.getElementById('visit-modal-note').value.trim();
-            if (!note) return alert('يرجى كتابة ملاحظة للزيارة');
+            try {
+                const company = document.getElementById('visit-modal-company').innerText;
+                const note = document.getElementById('visit-modal-note').value.trim();
+                if (!note) return alert('يرجى كتابة ملاحظة للزيارة');
+                
+                if (!company) return alert('خطأ: لم يتم تحديد الشركة');
+                if (!selD) return alert('خطأ: لم يتم تحديد التاريخ');
 
-            db.visits.push({ company, note, date: selD, timestamp: new Date().toLocaleTimeString('ar-EG') });
-            refresh();
-            closeVisitModal();
+                const newVisit = {
+                    company,
+                    note,
+                    date: selD,
+                    timestamp: new Date().toLocaleTimeString('ar-EG'),
+                    id: Date.now() // إضافة معرف فريد
+                };
+                
+                if (!db.visits) db.visits = [];
+                db.visits.push(newVisit);
+                localStorage.setItem('PHYSIO_V50', JSON.stringify(db));
+                refresh();
+                closeVisitModal();
+                alert('تم حفظ الزيارة بنجاح ✅');
+            } catch(err) {
+                console.log("[v0] Save Visit Error:", err);
+                alert('حدث خطأ أثناء حفظ الزيارة');
+            }
         }
 
         // حفظ شركة جديدة
         function saveNewCompany() {
-            const name = document.getElementById('comp-name').value.trim();
-            const zone = document.getElementById('comp-zone').value;
-            if(!name) return alert("يرجى كتابة اسم الشركة");
-            
-            if (db.companies.some(c => c.name === name)) {
-                return alert("هذه الشركة موجودة بالفعل! استخدم البحث أو الضغط المطول لتعديلها.");
+            try {
+                const name = document.getElementById('comp-name').value.trim();
+                const zone = document.getElementById('comp-zone').value;
+                if(!name) return alert("يرجى كتابة اسم الشركة");
+                
+                if (!zone) return alert("يرجى اختيار المنطقة");
+                
+                if (db.companies.some(c => c.name === name)) {
+                    return alert("هذه الشركة موجودة بالفعل! استخدم البحث أو الضغط المطول لتعديلها.");
+                }
+
+                let pList = []; 
+                document.querySelectorAll('#persons-container > div').forEach(d => { 
+                    const n = d.querySelector('.p-name').value.trim(); 
+                    if(n) pList.push({ 
+                        title: d.querySelector('.p-title').value, 
+                        name: n, 
+                        phone: d.querySelector('.p-phone').value 
+                    }); 
+                });
+
+                const plannedDays = getSelectedDays('plan-days-checkboxes');
+                const generalNotes = document.getElementById('comp-general-notes').value.trim();
+
+                if (!db.companies) db.companies = [];
+
+                db.companies.push({ 
+                    name, 
+                    zone, 
+                    persons: pList, 
+                    location: document.getElementById('v-location').value,
+                    plannedDays: plannedDays,
+                    notes: generalNotes,
+                    products: [],
+                    createdAt: new Date().toISOString()
+                });
+                
+                // حفظ البيانات فوراً
+                localStorage.setItem('PHYSIO_V50', JSON.stringify(db));
+                
+                // مسح الحقول
+                document.getElementById('comp-name').value=''; 
+                document.getElementById('persons-container').innerHTML = ''; 
+                addPerson();
+                document.getElementById('v-location').value = '';
+                document.getElementById('gps-status').innerText = '';
+                document.getElementById('comp-general-notes').value = '';
+                document.querySelectorAll('#plan-days-checkboxes input[type=checkbox]').forEach(cb => cb.checked = false);
+
+                refresh(); 
+                alert("تم إضافة الشركة بنجاح ✅");
+                tab('p-home', document.querySelectorAll('.nav-link')[0]);
+            } catch(err) {
+                console.log("[v0] Save Company Error:", err);
+                alert('حدث خطأ أثناء إضافة الشركة');
             }
-
-            let pList = []; 
-            document.querySelectorAll('#persons-container > div').forEach(d => { 
-                const n = d.querySelector('.p-name').value.trim(); 
-                if(n) pList.push({ title: d.querySelector('.p-title').value, name: n, phone: d.querySelector('.p-phone').value }); 
-            });
-
-            const plannedDays = getSelectedDays('plan-days-checkboxes');
-            const generalNotes = document.getElementById('comp-general-notes').value.trim();
-
-            db.companies.push({ 
-                name, 
-                zone, 
-                persons: pList, 
-                location: document.getElementById('v-location').value,
-                plannedDays: plannedDays,
-                notes: generalNotes
-            });
-            
-            // مسح الحقول
-            document.getElementById('comp-name').value=''; 
-            document.getElementById('persons-container').innerHTML = ''; 
-            addPerson();
-            document.getElementById('v-location').value = '';
-            document.getElementById('gps-status').innerText = '';
-            document.getElementById('comp-general-notes').value = '';
-            document.querySelectorAll('#plan-days-checkboxes input[type=checkbox]').forEach(cb => cb.checked = false);
-
-            refresh(); 
-            tab('p-home', document.querySelectorAll('.nav-link')[0]);
         }
 
         // عرض الشركات في صفحة البيانات (مع تحسين اللمس)
@@ -951,66 +1108,88 @@
 
         // دالة حذف الشركة بالكامل
         function deleteCompanyFromEdit() {
-            const companyName = document.getElementById('edit-original-name').value;
-            if (!companyName) return;
-            
-            if (confirm(`هل أنت متأكد من حذف شركة "${companyName}" نهائياً؟ سيتم حذف جميع الزيارات المرتبطة بها أيضاً.`)) {
-                // حذف الشركة من قائمة الشركات
-                db.companies = db.companies.filter(c => c.name !== companyName);
+            try {
+                const companyName = document.getElementById('edit-original-name').value;
+                if (!companyName) return alert('خطأ: لم يتم تحديد الشركة');
                 
-                // حذف جميع الزيارات المرتبطة بهذه الشركة
-                db.visits = db.visits.filter(v => v.company !== companyName);
-                
-                // حذف الشركة من خطة الأسبوع (جميع الأيام)
-                for (let day = 0; day < 5; day++) {
-                    db.weeklyPlan[day] = db.weeklyPlan[day].filter(name => name !== companyName);
+                if (confirm(`هل أنت متأكد من حذف شركة "${companyName}" نهائياً؟ سيتم حذف جميع الزيارات المرتبطة بها أيضاً.`)) {
+                    // حذف الشركة من قائمة الشركات
+                    db.companies = (db.companies || []).filter(c => c.name !== companyName);
+                    
+                    // حذف جميع الزيارات المرتبطة بهذه الشركة
+                    db.visits = (db.visits || []).filter(v => v.company !== companyName);
+                    
+                    // حذف الشركة من خطة الأسبوع (جميع الأيام)
+                    for (let day = 0; day < 5; day++) {
+                        if (db.weeklyPlan[day]) {
+                            db.weeklyPlan[day] = db.weeklyPlan[day].filter(name => name !== companyName);
+                        }
+                    }
+                    
+                    localStorage.setItem('PHYSIO_V50', JSON.stringify(db));
+                    closeEditFullModal();
+                    refresh();
+                    alert(`تم حذف الشركة "${companyName}" بنجاح ✅`);
                 }
-                
-                localStorage.setItem('PHYSIO_V50', JSON.stringify(db));
-                closeEditFullModal();
-                refresh(); // تحديث الصفحة
+            } catch(err) {
+                console.log("[v0] Delete Company Error:", err);
+                alert('حدث خطأ أثناء حذف الشركة');
             }
         }
 
         function saveFullEdit() {
-            const oldN = document.getElementById('edit-original-name').value;
-            const newN = document.getElementById('edit-name').value.trim();
-            const newZ = document.getElementById('edit-zone').value;
-            const newPlannedDays = getSelectedDays('edit-plan-days-checkboxes');
-            const newNotes = document.getElementById('edit-general-notes').value.trim();
-            
-            if(!newN) return alert("الاسم مطلوب");
-            
-            let pList = [];
-            document.querySelectorAll('#edit-persons-container .person-edit-row').forEach(row => {
-                const title = row.querySelector('.ep-title').value;
-                const name = row.querySelector('.ep-name').value.trim();
-                const phone = row.querySelector('.ep-phone').value.trim();
-                if (name) pList.push({ title, name, phone });
-            });
-
-            const cIdx = db.companies.findIndex(c => c.name === oldN);
-            if(cIdx !== -1) {
-                db.companies[cIdx].name = newN;
-                db.companies[cIdx].zone = newZ;
-                db.companies[cIdx].persons = pList;
-                db.companies[cIdx].plannedDays = newPlannedDays;
-                db.companies[cIdx].notes = newNotes;
-                // products تُحفظ مباشرة على الكائن لحظة الإضافة/الحذف، نحافظ عليها هنا
-                if (!db.companies[cIdx].products) db.companies[cIdx].products = [];
+            try {
+                const oldN = document.getElementById('edit-original-name').value;
+                const newN = document.getElementById('edit-name').value.trim();
+                const newZ = document.getElementById('edit-zone').value;
+                const newPlannedDays = getSelectedDays('edit-plan-days-checkboxes');
+                const newNotes = document.getElementById('edit-general-notes').value.trim();
                 
-                db.visits.forEach(v => {
-                    if(v.company === oldN) {
-                        v.company = newN;
-                        if(v === db.visits.filter(x => x.company === newN).pop()) v.note = document.getElementById('edit-last-note').value;
-                    }
+                if(!newN) return alert("الاسم مطلوب");
+                if(!newZ) return alert("المنطقة مطلوبة");
+                
+                let pList = [];
+                document.querySelectorAll('#edit-persons-container .person-edit-row').forEach(row => {
+                    const title = row.querySelector('.ep-title').value;
+                    const name = row.querySelector('.ep-name').value.trim();
+                    const phone = row.querySelector('.ep-phone').value.trim();
+                    if (name) pList.push({ title, name, phone });
                 });
-                // تحديث أسماء الشركات في weeklyPlan إذا تغير الاسم
-                for (let day=0; day<5; day++) {
-                    db.weeklyPlan[day] = db.weeklyPlan[day].map(n => n === oldN ? newN : n);
+
+                const cIdx = db.companies.findIndex(c => c.name === oldN);
+                if(cIdx !== -1) {
+                    db.companies[cIdx].name = newN;
+                    db.companies[cIdx].zone = newZ;
+                    db.companies[cIdx].persons = pList;
+                    db.companies[cIdx].plannedDays = newPlannedDays;
+                    db.companies[cIdx].notes = newNotes;
+                    // products تُحفظ مباشرة على الكائن لحظة الإضافة/الحذف، نحافظ عليها هنا
+                    if (!db.companies[cIdx].products) db.companies[cIdx].products = [];
+                    
+                    db.visits.forEach(v => {
+                        if(v.company === oldN) {
+                            v.company = newN;
+                            if(v === db.visits.filter(x => x.company === newN).pop()) v.note = document.getElementById('edit-last-note').value;
+                        }
+                    });
+                    
+                    // تحديث أسماء الشركات في weeklyPlan إذا تغير الاسم
+                    for (let day=0; day<5; day++) {
+                        db.weeklyPlan[day] = db.weeklyPlan[day].map(n => n === oldN ? newN : n);
+                    }
+                    
+                    // حفظ البيانات فوراً
+                    localStorage.setItem('PHYSIO_V50', JSON.stringify(db));
+                    
+                    refresh();
+                    closeEditFullModal();
+                    alert('تم تحديث الشركة بنجاح ✅');
+                } else {
+                    alert('خطأ: لم يتم العثور على الشركة');
                 }
-                refresh();
-                closeEditFullModal();
+            } catch(err) {
+                console.log("[v0] Save Full Edit Error:", err);
+                alert('حدث خطأ أثناء حفظ التغييرات');
             }
         }
 
@@ -1029,25 +1208,55 @@
             } 
         }
 
-        function renderVisits() { const f = db.visits.filter(v => v.date === selD); document.getElementById('daily-visits').innerHTML = f.map(v => `<div class="card" style="border-right:5px solid var(--teal)"><b>${v.company}</b><br><small>${v.note}</small></div>`).join('') || '<p style="text-align:center; opacity:0.5;">لا زيارات اليوم</p>'; }
+        function renderVisits() { 
+            const container = document.getElementById('daily-visits');
+            if (!container) return;
+            
+            const f = db.visits.filter(v => v.date === selD);
+            if (f.length === 0) {
+                container.innerHTML = '<p style="text-align:center; opacity:0.5;">لا زيارات اليوم</p>';
+                return;
+            }
+            
+            container.innerHTML = f.map(v => 
+                `<div class="card" style="border-right:5px solid var(--teal)"><b>${v.company}</b><br><small>${v.note}</small></div>`
+            ).join('');
+        }
         
         function showCompDetails(name) { 
-            const c = db.companies.find(co => co.name === name); 
-            const vs = db.visits.filter(v => v.company === name); 
-            document.getElementById('modal-title').innerText = c.name; 
-            let h = `<p><b>المنطقة:</b> ${c.zone}</p>`; 
-            if (c.plannedDays && c.plannedDays.length) {
-                h += `<p><b>أيام الزيارة:</b> ${c.plannedDays.map(d => dayNames[d]).join(' - ')}</p>`;
+            try {
+                const c = db.companies.find(co => co.name === name); 
+                if (!c) {
+                    alert('خطأ: لم يتم العثور على الشركة');
+                    return;
+                }
+                
+                const vs = db.visits.filter(v => v.company === name); 
+                document.getElementById('modal-title').innerText = c.name; 
+                let h = `<p><b>المنطقة:</b> ${c.zone || 'غير محدد'}</p>`; 
+                if (c.plannedDays && c.plannedDays.length) {
+                    h += `<p><b>أيام الزيارة:</b> ${c.plannedDays.map(d => dayNames[d] || 'غير معروف').join(' - ')}</p>`;
+                }
+                if (c.notes) h += `<p><b>ملاحظات عامة:</b> ${c.notes}</p>`;
+                if(c.location) h += `<p><b>العنوان:</b> <a href="${c.location}" target="_blank" style="color:var(--teal);">فتح الخريطة 📍</a></p>`; 
+                if (c.products && c.products.length) {
+                    h += `<hr><h4>🧴 المنتجات والعروض:</h4><div style="display:flex;flex-wrap:wrap;gap:5px;margin-bottom:8px;">${c.products.map(p=>`<span class="product-tag" style="cursor:default;">${p}</span>`).join('')}</div>`;
+                }
+                h += `<hr><h4>المسؤولين:</h4>`; 
+                (c.persons||[]).forEach(p => h += `<p>• ${p.title}/ ${p.name} (${p.phone || 'لا يوجد'})</p>`); 
+                h += `<hr><h4>سجل الزيارات:</h4>`;
+                if (vs.length === 0) {
+                    h += '<p style="text-align:center; opacity:0.5;">لا توجد زيارات مسجلة</p>';
+                } else {
+                    vs.forEach(v => h += `<p style="font-size:12px; border-bottom:1px solid #eee; padding:5px 0;">📅 ${v.date}: ${v.note}</p>`);
+                }
+                
+                document.getElementById('modal-content').innerHTML = h; 
+                document.getElementById('details-modal').style.display = 'flex'; 
+            } catch(err) {
+                console.log("[v0] Show Company Details Error:", err);
+                alert('حدث خطأ أثناء عرض بيانات الشركة');
             }
-            if (c.notes) h += `<p><b>ملاحظات عامة:</b> ${c.notes}</p>`;
-            if(c.location) h += `<p><b>العنوان:</b> <a href="${c.location}" target="_blank" style="color:var(--teal);">فتح الخريطة 📍</a></p>`; 
-            if (c.products && c.products.length) {
-                h += `<hr><h4>🧴 المنتجات والعروض:</h4><div style="display:flex;flex-wrap:wrap;gap:5px;margin-bottom:8px;">${c.products.map(p=>`<span class="product-tag" style="cursor:default;">${p}</span>`).join('')}</div>`;
-            }
-            h += `<hr><h4>المسؤولين:</h4>`; (c.persons||[]).forEach(p => h += `<p>• ${p.title}/ ${p.name} (${p.phone})</p>`); 
-            h += `<hr><h4>سجل الزيارات:</h4>`; vs.forEach(v => h += `<p style="font-size:12px; border-bottom:1px solid #eee; padding:5px 0;">📅 ${v.date}: ${v.note}</p>`); 
-            document.getElementById('modal-content').innerHTML = h; 
-            document.getElementById('details-modal').style.display = 'flex'; 
         }
         
         function addPerson() { 
@@ -1095,51 +1304,72 @@
         }
 
         function generatePDF(data, fileName) {
-            // تعبئة البيانات في القالب
-            document.getElementById('pdf-user').innerText = db.user;
-            document.getElementById('pdf-period').innerText = fileName.replace(/_/g, ' ');
-            document.getElementById('pdf-date').innerText = new Date().toLocaleDateString('ar-EG');
+            try {
+                // تعبئة البيانات في القالب
+                document.getElementById('pdf-user').innerText = db.user;
+                document.getElementById('pdf-period').innerText = fileName.replace(/_/g, ' ');
+                document.getElementById('pdf-date').innerText = new Date().toLocaleDateString('ar-EG');
 
-            let rows = "";
-            data.forEach(v => {
-                const c = db.companies.find(co => co.name === v.company) || {};
-                const p = c.persons && c.persons[0] ? c.persons[0].name : '-';
-                rows += `<tr>
-                    <td>${v.company}</td>
-                    <td>${c.zone || '-'}</td>
-                    <td>${p}</td>
-                    <td>${v.note}</td>
-                    <td>${v.timestamp || ''}</td>
-                </tr>`;
-            });
-            document.getElementById('pdf-body').innerHTML = rows;
+                let rows = "";
+                data.forEach(v => {
+                    const c = db.companies.find(co => co.name === v.company) || {};
+                    const p = c.persons && c.persons[0] ? c.persons[0].name : '-';
+                    rows += `<tr>
+                        <td>${v.company}</td>
+                        <td>${c.zone || '-'}</td>
+                        <td>${p}</td>
+                        <td>${v.note}</td>
+                        <td>${v.timestamp || ''}</td>
+                    </tr>`;
+                });
+                document.getElementById('pdf-body').innerHTML = rows;
 
-            const el = document.getElementById('pdf-template');
-            el.style.display = 'block';
-            
-            // إعدادات محسنة لـ html2pdf - أهم نقطة لتحسين الجودة
-            const opt = {
-                margin: [15, 15, 15, 15], // زيادة الهوامش
-                filename: `${fileName}.pdf`,
-                image: { type: 'jpeg', quality: 1 },
-                html2canvas: { 
-                    scale: 2.5,          // دقة عالية
-                    useCORS: true, 
-                    letterRendering: true,
-                    logging: false,
-                    dpi: 300
-                },
-                jsPDF: { 
-                    unit: 'mm', 
-                    format: 'a4', 
-                    orientation: 'portrait',
-                    compress: true
+                const el = document.getElementById('pdf-template');
+                if (!el) {
+                    alert("خطأ: قالب PDF غير موجود");
+                    return;
                 }
-            };
+                
+                el.style.display = 'block';
+                
+                // إعدادات محسنة لـ html2pdf - أهم نقطة لتحسين الجودة
+                const opt = {
+                    margin: [15, 15, 15, 15], // زيادة الهوامش
+                    filename: `${fileName}.pdf`,
+                    image: { type: 'jpeg', quality: 1 },
+                    html2canvas: { 
+                        scale: 2.5,          // دقة عالية
+                        useCORS: true, 
+                        letterRendering: true,
+                        logging: false,
+                        dpi: 300
+                    },
+                    jsPDF: { 
+                        unit: 'mm', 
+                        format: 'a4', 
+                        orientation: 'portrait',
+                        compress: true
+                    }
+                };
 
-            html2pdf().from(el).set(opt).save().then(() => {
-                el.style.display = 'none';
-            });
+                // إضافة معالجة صحيحة للأخطاء
+                if (typeof html2pdf === 'function') {
+                    html2pdf().from(el).set(opt).save()
+                        .catch(err => {
+                            console.log("[v0] PDF Error:", err);
+                            alert("حدث خطأ أثناء إنشاء ملف PDF. يرجى المحاولة مجدداً.");
+                        })
+                        .finally(() => {
+                            el.style.display = 'none';
+                        });
+                } else {
+                    alert("مكتبة PDF غير محملة بعد. يرجى الانتظار والمحاولة مجدداً.");
+                    el.style.display = 'none';
+                }
+            } catch(err) {
+                console.log("[v0] PDF Generation Error:", err);
+                alert("حدث خطأ أثناء إنشاء التقرير PDF");
+            }
         }
 
         function shareWA() {
@@ -1203,49 +1433,63 @@
         }
 
         function renderAdminCompanyList() {
-            const listContainer = document.getElementById('admin-company-list');
-            if (!listContainer) return;
-            const companiesForDay = db.weeklyPlan[currentAdminDay] || [];
-            
-            if (companiesForDay.length === 0) {
-                listContainer.innerHTML = '<p class="card" style="text-align:center;">لا توجد شركات في هذا اليوم</p>';
-                return;
-            }
-
-            let html = '';
-            companiesForDay.forEach((companyName) => {
-                const company = db.companies.find(c => c.name === companyName);
-                if (!company) return;
-                html += `
-                    <div class="plan-company-row" data-company="${company.name.replace(/'/g, "\\'")}">
-                        <span class="drag-handle">☰</span>
-                        <div class="plan-company-info" onclick="showCompDetails('${company.name.replace(/'/g, "\\'")}')">
-                            <b>${company.name}</b><br>
-                            <small>📍 ${company.zone}</small>
-                        </div>
-                        <button class="delete-btn small" onclick="removeCompanyFromDay('${company.name.replace(/'/g, "\\'")}')" title="حذف من الخطة">إزالة</button>
-                    </div>`;
-            });
-            listContainer.innerHTML = html;
-
-            // تفعيل السحب (drag and drop) باستخدام SortableJS
-            if (sortableInstance) sortableInstance.destroy();
-            sortableInstance = new Sortable(listContainer, {
-                animation: 150,
-                handle: '.drag-handle',
-                onEnd: function(evt) {
-                    // إعادة بناء المصفوفة حسب الترتيب الجديد
-                    const newOrder = [];
-                    const items = listContainer.querySelectorAll('.plan-company-row');
-                    items.forEach(item => {
-                        const companyName = item.getAttribute('data-company');
-                        if (companyName) newOrder.push(companyName);
-                    });
-                    db.weeklyPlan[currentAdminDay] = newOrder;
-                    localStorage.setItem('PHYSIO_V50', JSON.stringify(db));
-                    refresh(); // تحديث الصفحة الرئيسية
+            try {
+                const listContainer = document.getElementById('admin-company-list');
+                if (!listContainer) return;
+                const companiesForDay = db.weeklyPlan[currentAdminDay] || [];
+                
+                if (companiesForDay.length === 0) {
+                    listContainer.innerHTML = '<p class="card" style="text-align:center;">لا توجد شركات في هذا اليوم</p>';
+                    return;
                 }
-            });
+
+                let html = '';
+                companiesForDay.forEach((companyName) => {
+                    const company = db.companies.find(c => c.name === companyName);
+                    if (!company) return;
+                    html += `
+                        <div class="plan-company-row" data-company="${company.name.replace(/'/g, "\\'")}">
+                            <span class="drag-handle">☰</span>
+                            <div class="plan-company-info" onclick="showCompDetails('${company.name.replace(/'/g, "\\'")}')">
+                                <b>${company.name}</b><br>
+                                <small>📍 ${company.zone}</small>
+                            </div>
+                            <button class="delete-btn small" onclick="removeCompanyFromDay('${company.name.replace(/'/g, "\\'")}')" title="حذف من الخطة">إزالة</button>
+                        </div>`;
+                });
+                listContainer.innerHTML = html;
+
+                // تفعيل السحب (drag and drop) باستخدام SortableJS
+                if (sortableInstance) {
+                    sortableInstance.destroy();
+                    sortableInstance = null;
+                }
+                
+                if (typeof Sortable !== 'undefined') {
+                    sortableInstance = new Sortable(listContainer, {
+                        animation: 150,
+                        handle: '.drag-handle',
+                        onEnd: function(evt) {
+                            try {
+                                // إعادة بناء المصفوفة حسب الترتيب الجديد
+                                const newOrder = [];
+                                const items = listContainer.querySelectorAll('.plan-company-row');
+                                items.forEach(item => {
+                                    const companyName = item.getAttribute('data-company');
+                                    if (companyName) newOrder.push(companyName);
+                                });
+                                db.weeklyPlan[currentAdminDay] = newOrder;
+                                localStorage.setItem('PHYSIO_V50', JSON.stringify(db));
+                                refresh(); // تحديث الصفحة الرئيسية
+                            } catch(err) {
+                                console.log("[v0] Sortable onEnd Error:", err);
+                            }
+                        }
+                    });
+                }
+            } catch(err) {
+                console.log("[v0] Admin Company List Error:", err);
+            }
         }
 
         // عرض قائمة الشركات المتاحة للاختيار المتعدد (مع مراعاة منع التكرار)
@@ -1352,12 +1596,60 @@
         }
         function checkNewZone(sel) { if(sel.value === "NEW") { const n = prompt("اسم المنطقة الجديدة:"); if(n) { db.zones.push(n); refresh(); sel.value = n; } else sel.selectedIndex = 0; } }
         function toggleDrop() { document.getElementById("reportDrop").classList.toggle("show"); }
-        function exportData() { const blob = new Blob([JSON.stringify(db)], {type:"application/json"}); const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = `Physio_Backup_${new Date().toLocaleDateString()}.json`; a.click(); }
-        function importData(e) { const r = new FileReader(); r.onload = ev => { try { db = JSON.parse(ev.target.result); 
-            db.companies = db.companies.map(c => { if (!c.plannedDays) c.plannedDays = []; if (!c.notes) c.notes = ""; if (!c.persons) c.persons = []; if (!c.products) c.products = []; return c; });
-            if (!db.weeklyPlan) db.weeklyPlan = [[], [], [], [], []];
-            cleanWeeklyPlan(); // تنظيف البيانات بعد الاستيراد
-            refresh(); alert("تم استيراد البيانات بنجاح ✅"); } catch(err) { alert("خطأ في ملف الاستيراد"); } }; r.readAsText(e.target.files[0]); }
+        function exportData() {
+            try {
+                const blob = new Blob([JSON.stringify(db)], {type:"application/json"}); 
+                const a = document.createElement('a'); 
+                a.href = URL.createObjectURL(blob); 
+                a.download = `Physio_Backup_${new Date().toLocaleDateString()}.json`; 
+                a.click();
+                alert("تم تصدير البيانات بنجاح ✅");
+            } catch(err) {
+                console.log("[v0] Export Data Error:", err);
+                alert("حدث خطأ أثناء تصدير البيانات");
+            }
+        }
+        
+        function importData(e) {
+            try {
+                const file = e.target.files[0];
+                if (!file) return;
+                
+                const r = new FileReader(); 
+                r.onload = ev => { 
+                    try {
+                        const importedData = JSON.parse(ev.target.result);
+                        if (!importedData.visits || !importedData.companies) {
+                            throw new Error("صيغة الملف غير صحيحة");
+                        }
+                        
+                        db = importedData;
+                        db.companies = (db.companies || []).map(c => { 
+                            if (!c.plannedDays) c.plannedDays = []; 
+                            if (!c.notes) c.notes = ""; 
+                            if (!c.persons) c.persons = []; 
+                            if (!c.products) c.products = []; 
+                            if (!c.zone) c.zone = "غير محدد";
+                            return c; 
+                        });
+                        if (!db.weeklyPlan) db.weeklyPlan = [[], [], [], [], []];
+                        if (!db.zones) db.zones = ["المعادي", "الدقي", "مدينة نصر", "المقطم", "حلوان", "العبور"];
+                        
+                        cleanWeeklyPlan(); // تنظيف البيانات بعد الاستيراد
+                        localStorage.setItem('PHYSIO_V50', JSON.stringify(db));
+                        refresh(); 
+                        alert("تم استيراد البيانات بنجاح ✅"); 
+                    } catch(err) {
+                        console.log("[v0] Import Parse Error:", err);
+                        alert("خطأ في صيغة الملف. تأكد من أنك تستخدم ملف نسخة احتياطية صحيح."); 
+                    }
+                }; 
+                r.readAsText(file); 
+            } catch(err) {
+                console.log("[v0] Import Data Error:", err);
+                alert("حدث خطأ أثناء استيراد البيانات");
+            }
+        }
 
         // ===== دوال المنتجات والعروض V60 =====
         function renderEditProducts(products) {
@@ -1369,28 +1661,43 @@
         }
 
         function addProductToEdit() {
-            const input = document.getElementById('edit-product-input');
-            const val = input.value.trim();
-            if (!val) return;
-            const name = document.getElementById('edit-original-name').value;
-            const c = db.companies.find(co => co.name === name);
-            if (c) {
+            try {
+                const input = document.getElementById('edit-product-input');
+                const val = input.value.trim();
+                if (!val) return alert('يرجى إدخال اسم المنتج أو العرض');
+                if (val.length > 50) return alert('اسم المنتج طويل جداً');
+                
+                const name = document.getElementById('edit-original-name').value;
+                const c = db.companies.find(co => co.name === name);
+                if (!c) return alert('خطأ: لم يتم العثور على الشركة');
+                
                 if (!c.products) c.products = [];
-                if (!c.products.includes(val)) {
-                    c.products.push(val);
-                    renderEditProducts(c.products);
-                }
+                if (c.products.includes(val)) return alert('هذا المنتج موجود بالفعل');
+                
+                c.products.push(val);
+                localStorage.setItem('PHYSIO_V50', JSON.stringify(db));
+                renderEditProducts(c.products);
+                input.value = '';
+                input.focus();
+            } catch(err) {
+                console.log("[v0] Add Product Error:", err);
+                alert('حدث خطأ أثناء إضافة المنتج');
             }
-            input.value = '';
-            input.focus();
         }
 
         function removeProductFromEdit(idx) {
-            const name = document.getElementById('edit-original-name').value;
-            const c = db.companies.find(co => co.name === name);
-            if (c && c.products) {
+            try {
+                const name = document.getElementById('edit-original-name').value;
+                const c = db.companies.find(co => co.name === name);
+                if (!c) return alert('خطأ: لم يتم العثور على الشركة');
+                if (!c.products) return;
+                
                 c.products.splice(idx, 1);
+                localStorage.setItem('PHYSIO_V50', JSON.stringify(db));
                 renderEditProducts(c.products);
+            } catch(err) {
+                console.log("[v0] Remove Product Error:", err);
+                alert('حدث خطأ أثناء حذف المنتج');
             }
         }
 

@@ -235,7 +235,7 @@
         .report-section { margin-bottom: 20px; }
         .report-title { font-size: 15px; font-weight: 900; color: var(--navy); margin-bottom: 12px; display: flex; align-items: center; gap: 8px; }
         
-        /* مقارنة الأسابيع */
+        /* مقارنة الأسابي�� */
         .week-compare-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
         .week-box { background: white; border-radius: 14px; padding: 14px; border: 1px solid var(--border); text-align: center; }
         .week-box.current { border-color: var(--teal); border-width: 2px; }
@@ -315,7 +315,7 @@
         </div>
         <!-- تبويبات الهب -->
         <div class="hub-tabs" style="padding: 0 15px;">
-            <div class="hub-tab active" onclick="switchHubTab('stats')">📊 الإحصائيات</div>
+            <div class="hub-tab active" onclick="switchHubTab('stats')">📈 الإحصائيات</div>
             <div class="hub-tab" onclick="switchHubTab('control')">🛠️ التحكم</div>
         </div>
         <div class="hub-content">
@@ -445,7 +445,7 @@
         <div id="p-reports" class="page">
             <!-- مقارنة الأسبوع الحالي بالسابق -->
             <div class="card report-section">
-                <div class="report-title">📊 مقارنة الأسابيع</div>
+                <div class="report-title">📈 مقارنة الأسابيع</div>
                 <div class="week-compare-grid" id="week-compare-grid"></div>
                 <div style="margin-top:15px;">
                     <div style="font-size:12px; color:#888; font-weight:bold; margin-bottom:8px;">زيارات كل يوم — هذا الأسبوع 🟦 | الماضي ⬜</div>
@@ -455,20 +455,20 @@
 
             <!-- أكثر الشركات زيارة -->
             <div class="card report-section">
-                <div class="report-title">🏆 أكثر الشركات زيارةً (هذا الشهر)</div>
+                <div class="report-title">⭐ أكثر الشركات زيارةً (هذا الشهر)</div>
                 <div id="top-companies-list"></div>
             </div>
 
             <!-- شركات تحتاج متابعة -->
             <div class="card report-section">
-                <div class="report-title">⚠️ شركات تحتاج متابعة</div>
+                <div class="report-title">🔔 شركات تحتاج متابعة</div>
                 <div style="font-size:12px; color:#888; margin-bottom:10px;">مرتبة حسب آخر زيارة (الأقدم أولاً)</div>
                 <div id="unvisited-companies-list"></div>
             </div>
 
             <!-- تقرير المناطق -->
             <div class="card report-section">
-                <div class="report-title">📍 أداء المناطق (هذا الشهر)</div>
+                <div class="report-title">🗺️ أداء المناطق (هذا الشهر)</div>
                 <div id="zones-report-list"></div>
             </div>
         </div>
@@ -1098,7 +1098,7 @@
             container.appendChild(div);
         }
 
-        // دالة حذف مسؤول من نافذة التعديل
+        // دالة حذف مسؤول من نافذة التعد��ل
         function removePersonFromEdit(btn) {
             if (confirm('هل أنت متأكد من حذف هذا المسؤول؟')) {
                 const row = btn.closest('.person-edit-row');

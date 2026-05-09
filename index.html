@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Physio Masr Elite V50 - Text Delete & PDF Enhanced</title>
+    <title>Physio Masr Elite V60</title>
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;900&display=swap" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <!-- SortableJS for drag and drop -->
@@ -147,6 +147,63 @@
         /* تنسيق رأس مودال التعديل مع زر الإزالة */
         .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
         .modal-header h3 { margin: 0; color: var(--navy); }
+
+        /* ===== تطويرات V60 ===== */
+
+        /* صفحة التقارير */
+        .report-section { margin-bottom: 20px; }
+        .report-title { font-size: 15px; font-weight: 900; color: var(--navy); margin-bottom: 12px; display: flex; align-items: center; gap: 8px; }
+        
+        /* مقارنة الأسابيع */
+        .week-compare-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        .week-box { background: white; border-radius: 14px; padding: 14px; border: 1px solid var(--border); text-align: center; }
+        .week-box.current { border-color: var(--teal); border-width: 2px; }
+        .week-box-num { font-size: 28px; font-weight: 900; color: var(--teal); }
+        .week-box-lbl { font-size: 11px; color: #888; font-weight: 700; }
+        .week-change { font-size: 12px; font-weight: bold; margin-top: 4px; }
+        .week-change.up { color: #22c55e; }
+        .week-change.down { color: var(--red); }
+        .week-change.same { color: #888; }
+
+        /* شريط مقارنة أيام الأسبوع */
+        .days-bar-container { display: flex; gap: 6px; align-items: flex-end; height: 80px; padding: 0 5px; }
+        .day-bar-wrap { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 4px; height: 100%; justify-content: flex-end; }
+        .day-bar { width: 100%; background: var(--teal); border-radius: 6px 6px 0 0; min-height: 4px; transition: height 0.6s cubic-bezier(0.4,0,0.2,1); }
+        .day-bar.prev { background: #e2e8f0; }
+        .day-bar-label { font-size: 10px; font-weight: 700; color: #888; }
+        .day-bar-num { font-size: 11px; font-weight: 900; color: var(--navy); }
+
+        /* شركات لم تُزار */
+        .unvisited-item { display: flex; justify-content: space-between; align-items: center; padding: 10px 14px; background: white; border-radius: 12px; margin-bottom: 8px; border: 1px solid var(--border); }
+        .unvisited-badge { font-size: 11px; font-weight: bold; padding: 3px 10px; border-radius: 20px; }
+        .unvisited-badge.danger { background: #fff0f0; color: var(--red); }
+        .unvisited-badge.warning { background: #fffbeb; color: #d97706; }
+        .unvisited-badge.ok { background: #f0fdf4; color: #16a34a; }
+
+        /* متابعة المنتجات */
+        .product-tag { display: inline-flex; align-items: center; gap: 5px; background: #f0f7fa; border: 1px solid #d0e8f0; padding: 4px 10px; border-radius: 20px; font-size: 12px; font-weight: bold; color: var(--navy); margin: 3px; }
+        .product-tag button { background: none; border: none; color: #888; cursor: pointer; font-size: 14px; line-height: 1; padding: 0; }
+        .product-input-row { display: flex; gap: 8px; margin-bottom: 10px; }
+        .product-input-row input { flex: 1; margin-bottom: 0; }
+        .product-input-row button { white-space: nowrap; padding: 10px 14px; background: var(--teal); color: white; border: none; border-radius: 10px; font-weight: bold; cursor: pointer; font-family: inherit; }
+
+        /* أكثر الشركات زيارة */
+        .top-company-row { display: flex; align-items: center; gap: 10px; padding: 10px; background: white; border-radius: 12px; margin-bottom: 8px; border: 1px solid var(--border); }
+        .top-company-rank { width: 28px; height: 28px; border-radius: 50%; background: var(--navy); color: white; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 900; flex-shrink: 0; }
+        .top-company-rank.gold { background: linear-gradient(135deg, #f59e0b, #fbbf24); }
+        .top-company-rank.silver { background: linear-gradient(135deg, #94a3b8, #cbd5e1); }
+        .top-company-rank.bronze { background: linear-gradient(135deg, #b45309, #d97706); }
+        .top-company-info { flex: 1; }
+        .top-company-bar { height: 6px; background: #f0f7fa; border-radius: 3px; margin-top: 4px; overflow: hidden; }
+        .top-company-fill { height: 100%; background: var(--teal); border-radius: 3px; }
+
+        /* نشاط الهب - تبويب جديد */
+        .hub-tab { padding: 8px 14px; background: #eee; border-radius: 20px; font-size: 13px; font-weight: bold; cursor: pointer; white-space: nowrap; }
+        .hub-tab.active { background: var(--teal); color: white; }
+
+        /* تحسين بطاقات الإحصائيات */
+        .stat-box { position: relative; overflow: hidden; }
+        .stat-box::before { content: ''; position: absolute; top: -10px; right: -10px; width: 60px; height: 60px; background: var(--teal); opacity: 0.05; border-radius: 50%; }
     </style>
 </head>
 <body>
@@ -176,7 +233,7 @@
             </div>
         </div>
         <!-- تبويبات الهب -->
-        <div class="hub-tabs">
+        <div class="hub-tabs" style="padding: 0 15px;">
             <div class="hub-tab active" onclick="switchHubTab('stats')">📊 الإحصائيات</div>
             <div class="hub-tab" onclick="switchHubTab('control')">🛠️ التحكم</div>
         </div>
@@ -302,6 +359,38 @@
             <input type="text" id="comp-search" class="input" placeholder="بحث باسم الشركة أو المنطقة..." oninput="renderComps()">
             <div id="company-list" class="company-list-scroll"></div>
         </div>
+
+        <!-- صفحة التقارير والإحصائيات V60 -->
+        <div id="p-reports" class="page">
+            <!-- مقارنة الأسبوع الحالي بالسابق -->
+            <div class="card report-section">
+                <div class="report-title">📊 مقارنة الأسابيع</div>
+                <div class="week-compare-grid" id="week-compare-grid"></div>
+                <div style="margin-top:15px;">
+                    <div style="font-size:12px; color:#888; font-weight:bold; margin-bottom:8px;">زيارات كل يوم — هذا الأسبوع 🟦 | الماضي ⬜</div>
+                    <div class="days-bar-container" id="days-bar-chart"></div>
+                </div>
+            </div>
+
+            <!-- أكثر الشركات زيارة -->
+            <div class="card report-section">
+                <div class="report-title">🏆 أكثر الشركات زيارةً (هذا الشهر)</div>
+                <div id="top-companies-list"></div>
+            </div>
+
+            <!-- شركات تحتاج متابعة -->
+            <div class="card report-section">
+                <div class="report-title">⚠️ شركات تحتاج متابعة</div>
+                <div style="font-size:12px; color:#888; margin-bottom:10px;">مرتبة حسب آخر زيارة (الأقدم أولاً)</div>
+                <div id="unvisited-companies-list"></div>
+            </div>
+
+            <!-- تقرير المناطق -->
+            <div class="card report-section">
+                <div class="report-title">📍 أداء المناطق (هذا الشهر)</div>
+                <div id="zones-report-list"></div>
+            </div>
+        </div>
     </div>
 
     <!-- مودال التعديل الشامل (بالضغط المطول) مع زر إزالة الشركة -->
@@ -328,6 +417,13 @@
 
             <label>ملاحظات عامة</label>
             <textarea id="edit-general-notes" class="input" rows="2"></textarea>
+
+            <label>🧴 المنتجات والعروض المقدمة</label>
+            <div class="product-input-row">
+                <input type="text" id="edit-product-input" class="input" placeholder="اسم المنتج أو العرض" onkeydown="if(event.key==='Enter'){addProductToEdit(); event.preventDefault();}">
+                <button onclick="addProductToEdit()">إضافة</button>
+            </div>
+            <div id="edit-products-container" style="display:flex; flex-wrap:wrap; margin-bottom:12px;"></div>
 
             <label>سجل الملاحظات (أحدث زيارة)</label>
             <textarea id="edit-last-note" class="input" rows="3"></textarea>
@@ -408,6 +504,7 @@
         <div class="nav-link active" onclick="tab('p-home', this)"><svg class="icon" viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>الرئيسية</div>
         <div class="nav-link" onclick="tab('p-add', this); getLocation();"><svg class="icon" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>إضافة شركة</div>
         <div class="nav-link" onclick="tab('p-data', this)"><svg class="icon" viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20M4 19.5A2.5 2.5 0 0 0 6.5 22H20M4 19.5V3A2.5 2.5 0 0 1 6.5 0.5H20v16.5H6.5a2.5 2.5 0 0 0-2.5 3z"/></svg>البيانات</div>
+        <div class="nav-link" onclick="tab('p-reports', this); renderReportsPage();"><svg class="icon" viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>تقارير</div>
     </nav>
 
     <script>
@@ -419,7 +516,7 @@
             weeklyPlan: [[], [], [], [], []] // مصفوفة من 5 أيام، كل عنصر مصفوفة بأسماء الشركات المقررة (بالترتيب)
         };
         let viewM = new Date(), selD = new Date().toDateString();
-        let pressTimer, currentAdminDay = new Date().getDay(); // 0-4
+        let pressTimer, currentAdminDay = Math.min(new Date().getDay(), 4); // 0-4 فقط (الأحد-الخميس)
         let sortableInstance = null; // لتخزين كائن Sortable
         let currentCompanyForPerson = ""; // لتخزين اسم الشركة عند إضافة مسؤول
 
@@ -444,6 +541,7 @@
                 if (!c.notes) c.notes = "";
                 if (!c.plannedDays) c.plannedDays = [];
                 if (!c.persons) c.persons = [];
+                if (!c.products) c.products = [];
                 return c;
             });
 
@@ -715,6 +813,7 @@
         function attachTouchEvents(element, companyName) {
             let touchStartTime;
             let touchStartX, touchStartY;
+            let mouseStartX = 0, mouseStartY = 0;
             let longPressTriggered = false;
 
             element.addEventListener('touchstart', (e) => {
@@ -761,6 +860,8 @@
             // للفأرة (اختبار على الكمبيوتر)
             element.addEventListener('mousedown', (e) => {
                 touchStartTime = Date.now();
+                mouseStartX = e.clientX;
+                mouseStartY = e.clientY;
                 touchMoved = false;
                 longPressTriggered = false;
                 pressTimer = setTimeout(() => {
@@ -770,10 +871,12 @@
             });
 
             element.addEventListener('mousemove', (e) => {
-                // لا يمكن تتبع حركة الماوس بسهولة، لذا نعتبر أي حركة إلغاء
-                if (pressTimer) {
+                const dx = Math.abs(e.clientX - mouseStartX);
+                const dy = Math.abs(e.clientY - mouseStartY);
+                if ((dx > 10 || dy > 10) && pressTimer) {
                     clearTimeout(pressTimer);
                     pressTimer = null;
+                    touchMoved = true;
                 }
             });
 
@@ -808,6 +911,11 @@
             (c.persons || []).forEach(p => addPersonToEdit(p));
 
             document.getElementById('edit-general-notes').value = c.notes || '';
+            
+            // تحميل المنتجات
+            if (!c.products) c.products = [];
+            renderEditProducts(c.products);
+            document.getElementById('edit-product-input').value = '';
             
             const vs = db.visits.filter(v => v.company === name);
             document.getElementById('edit-last-note').value = vs.length ? vs[vs.length-1].note : "";
@@ -888,6 +996,8 @@
                 db.companies[cIdx].persons = pList;
                 db.companies[cIdx].plannedDays = newPlannedDays;
                 db.companies[cIdx].notes = newNotes;
+                // products تُحفظ مباشرة على الكائن لحظة الإضافة/الحذف، نحافظ عليها هنا
+                if (!db.companies[cIdx].products) db.companies[cIdx].products = [];
                 
                 db.visits.forEach(v => {
                     if(v.company === oldN) {
@@ -931,6 +1041,9 @@
             }
             if (c.notes) h += `<p><b>ملاحظات عامة:</b> ${c.notes}</p>`;
             if(c.location) h += `<p><b>العنوان:</b> <a href="${c.location}" target="_blank" style="color:var(--teal);">فتح الخريطة 📍</a></p>`; 
+            if (c.products && c.products.length) {
+                h += `<hr><h4>🧴 المنتجات والعروض:</h4><div style="display:flex;flex-wrap:wrap;gap:5px;margin-bottom:8px;">${c.products.map(p=>`<span class="product-tag" style="cursor:default;">${p}</span>`).join('')}</div>`;
+            }
             h += `<hr><h4>المسؤولين:</h4>`; (c.persons||[]).forEach(p => h += `<p>• ${p.title}/ ${p.name} (${p.phone})</p>`); 
             h += `<hr><h4>سجل الزيارات:</h4>`; vs.forEach(v => h += `<p style="font-size:12px; border-bottom:1px solid #eee; padding:5px 0;">📅 ${v.date}: ${v.note}</p>`); 
             document.getElementById('modal-content').innerHTML = h; 
@@ -1241,10 +1354,236 @@
         function toggleDrop() { document.getElementById("reportDrop").classList.toggle("show"); }
         function exportData() { const blob = new Blob([JSON.stringify(db)], {type:"application/json"}); const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = `Physio_Backup_${new Date().toLocaleDateString()}.json`; a.click(); }
         function importData(e) { const r = new FileReader(); r.onload = ev => { try { db = JSON.parse(ev.target.result); 
-            db.companies = db.companies.map(c => { if (!c.plannedDays) c.plannedDays = []; if (!c.notes) c.notes = ""; if (!c.persons) c.persons = []; return c; });
+            db.companies = db.companies.map(c => { if (!c.plannedDays) c.plannedDays = []; if (!c.notes) c.notes = ""; if (!c.persons) c.persons = []; if (!c.products) c.products = []; return c; });
             if (!db.weeklyPlan) db.weeklyPlan = [[], [], [], [], []];
             cleanWeeklyPlan(); // تنظيف البيانات بعد الاستيراد
             refresh(); alert("تم استيراد البيانات بنجاح ✅"); } catch(err) { alert("خطأ في ملف الاستيراد"); } }; r.readAsText(e.target.files[0]); }
+
+        // ===== دوال المنتجات والعروض V60 =====
+        function renderEditProducts(products) {
+            const container = document.getElementById('edit-products-container');
+            if (!container) return;
+            container.innerHTML = (products || []).map((p, i) => 
+                `<span class="product-tag">${p}<button onclick="removeProductFromEdit(${i})" title="حذف">×</button></span>`
+            ).join('');
+        }
+
+        function addProductToEdit() {
+            const input = document.getElementById('edit-product-input');
+            const val = input.value.trim();
+            if (!val) return;
+            const name = document.getElementById('edit-original-name').value;
+            const c = db.companies.find(co => co.name === name);
+            if (c) {
+                if (!c.products) c.products = [];
+                if (!c.products.includes(val)) {
+                    c.products.push(val);
+                    renderEditProducts(c.products);
+                }
+            }
+            input.value = '';
+            input.focus();
+        }
+
+        function removeProductFromEdit(idx) {
+            const name = document.getElementById('edit-original-name').value;
+            const c = db.companies.find(co => co.name === name);
+            if (c && c.products) {
+                c.products.splice(idx, 1);
+                renderEditProducts(c.products);
+            }
+        }
+
+        // ===== صفحة التقارير V60 =====
+        function renderReportsPage() {
+            renderWeekComparison();
+            renderTopCompanies();
+            renderUnvisitedCompanies();
+            renderZonesReport();
+        }
+
+        function getWeekBounds(offsetWeeks) {
+            const now = new Date();
+            const day = now.getDay();
+            // بداية الأسبوع = الأحد
+            const startOfWeek = new Date(now);
+            startOfWeek.setDate(now.getDate() - day - (offsetWeeks * 7));
+            startOfWeek.setHours(0, 0, 0, 0);
+            const endOfWeek = new Date(startOfWeek);
+            endOfWeek.setDate(startOfWeek.getDate() + 6);
+            endOfWeek.setHours(23, 59, 59, 999);
+            return { start: startOfWeek, end: endOfWeek };
+        }
+
+        function getVisitsInRange(start, end) {
+            return db.visits.filter(v => {
+                const d = new Date(v.date);
+                return d >= start && d <= end;
+            });
+        }
+
+        function renderWeekComparison() {
+            const thisWeek = getWeekBounds(0);
+            const lastWeek = getWeekBounds(1);
+            const thisVisits = getVisitsInRange(thisWeek.start, thisWeek.end);
+            const lastVisits = getVisitsInRange(lastWeek.start, lastWeek.end);
+
+            const thisCnt = thisVisits.length;
+            const lastCnt = lastVisits.length;
+            const diff = thisCnt - lastCnt;
+            const pct = lastCnt > 0 ? Math.round((diff / lastCnt) * 100) : (thisCnt > 0 ? 100 : 0);
+            const changeClass = diff > 0 ? 'up' : diff < 0 ? 'down' : 'same';
+            const changeIcon = diff > 0 ? '▲' : diff < 0 ? '▼' : '—';
+
+            const thisComps = new Set(thisVisits.map(v => v.company)).size;
+            const lastComps = new Set(lastVisits.map(v => v.company)).size;
+
+            document.getElementById('week-compare-grid').innerHTML = `
+                <div class="week-box current">
+                    <div class="week-box-num">${thisCnt}</div>
+                    <div class="week-box-lbl">زيارات هذا الأسبوع</div>
+                    <div class="week-change ${changeClass}">${changeIcon} ${Math.abs(pct)}% ${diff >= 0 ? 'نمو' : 'انخفاض'}</div>
+                </div>
+                <div class="week-box">
+                    <div class="week-box-num">${lastCnt}</div>
+                    <div class="week-box-lbl">زيارات الأسبوع الماضي</div>
+                    <div class="week-change same">عملاء: ${thisComps} ← ${lastComps}</div>
+                </div>
+            `;
+
+            // رسم بياني يومي
+            const dayNamesShort = ['أحد','إثن','ثلا','أرب','خمس'];
+            const thisPerDay = [0,0,0,0,0];
+            const lastPerDay = [0,0,0,0,0];
+
+            thisVisits.forEach(v => {
+                const d = new Date(v.date).getDay();
+                if (d < 5) thisPerDay[d]++;
+            });
+            lastVisits.forEach(v => {
+                const d = new Date(v.date).getDay();
+                if (d < 5) lastPerDay[d]++;
+            });
+
+            const maxVal = Math.max(...thisPerDay, ...lastPerDay, 1);
+            const barContainer = document.getElementById('days-bar-chart');
+            barContainer.innerHTML = '';
+
+            dayNamesShort.forEach((name, i) => {
+                const thisH = Math.round((thisPerDay[i] / maxVal) * 65);
+                const lastH = Math.round((lastPerDay[i] / maxVal) * 65);
+                barContainer.innerHTML += `
+                    <div class="day-bar-wrap" style="gap:2px;">
+                        <div class="day-bar-num">${thisPerDay[i]||''}</div>
+                        <div style="display:flex; gap:2px; align-items:flex-end; height:65px;">
+                            <div style="width:10px; background:#e2e8f0; border-radius:4px 4px 0 0; height:${lastH}px; min-height:3px;"></div>
+                            <div style="width:10px; background:var(--teal); border-radius:4px 4px 0 0; height:${thisH}px; min-height:3px;"></div>
+                        </div>
+                        <div class="day-bar-label">${name}</div>
+                    </div>`;
+            });
+        }
+
+        function renderTopCompanies() {
+            const now = new Date();
+            const mVisits = db.visits.filter(v => {
+                const d = new Date(v.date);
+                return d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear();
+            });
+
+            const counts = {};
+            mVisits.forEach(v => { counts[v.company] = (counts[v.company] || 0) + 1; });
+            const sorted = Object.entries(counts).sort((a,b) => b[1]-a[1]).slice(0, 7);
+            const maxCnt = sorted[0]?.[1] || 1;
+            const rankClasses = ['gold', 'silver', 'bronze'];
+
+            if (!sorted.length) {
+                document.getElementById('top-companies-list').innerHTML = '<p style="text-align:center; opacity:0.5;">لا بيانات هذا الشهر</p>';
+                return;
+            }
+
+            document.getElementById('top-companies-list').innerHTML = sorted.map(([name, cnt], i) => {
+                const c = db.companies.find(co => co.name === name) || {};
+                const fillPct = Math.round((cnt / maxCnt) * 100);
+                return `
+                    <div class="top-company-row">
+                        <div class="top-company-rank ${rankClasses[i] || ''}">${i+1}</div>
+                        <div class="top-company-info">
+                            <b style="font-size:13px;">${name}</b>
+                            <small style="color:#888; display:block;">📍 ${c.zone || ''} • ${cnt} زيارة</small>
+                            <div class="top-company-bar"><div class="top-company-fill" style="width:${fillPct}%"></div></div>
+                        </div>
+                        <span style="font-size:20px; font-weight:900; color:var(--teal);">${cnt}</span>
+                    </div>`;
+            }).join('');
+        }
+
+        function renderUnvisitedCompanies() {
+            const now = new Date();
+            const result = db.companies.map(c => {
+                const visits = db.visits.filter(v => v.company === c.name);
+                const lastVisit = visits.length ? new Date(visits[visits.length-1].date) : null;
+                const daysSince = lastVisit ? Math.floor((now - lastVisit) / (1000*60*60*24)) : 9999;
+                return { name: c.name, zone: c.zone, daysSince, lastVisit };
+            }).sort((a,b) => b.daysSince - a.daysSince).slice(0, 10);
+
+            document.getElementById('unvisited-companies-list').innerHTML = result.map(r => {
+                let badgeClass, badgeText;
+                if (r.daysSince >= 30 || r.daysSince === 9999) {
+                    badgeClass = 'danger';
+                    badgeText = r.daysSince === 9999 ? 'لم تُزار أبداً' : `${r.daysSince} يوم`;
+                } else if (r.daysSince >= 14) {
+                    badgeClass = 'warning';
+                    badgeText = `${r.daysSince} يوم`;
+                } else {
+                    badgeClass = 'ok';
+                    badgeText = `${r.daysSince} يوم`;
+                }
+                return `
+                    <div class="unvisited-item">
+                        <div>
+                            <b style="font-size:13px;">${r.name}</b>
+                            <small style="color:#888; display:block;">📍 ${r.zone}</small>
+                        </div>
+                        <span class="unvisited-badge ${badgeClass}">${badgeText}</span>
+                    </div>`;
+            }).join('');
+        }
+
+        function renderZonesReport() {
+            const now = new Date();
+            const mVisits = db.visits.filter(v => {
+                const d = new Date(v.date);
+                return d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear();
+            });
+
+            const zoneCounts = {};
+            mVisits.forEach(v => {
+                const c = db.companies.find(co => co.name === v.company);
+                if (c) zoneCounts[c.zone] = (zoneCounts[c.zone] || 0) + 1;
+            });
+
+            const sorted = Object.entries(zoneCounts).sort((a,b) => b[1]-a[1]);
+            const maxCnt = sorted[0]?.[1] || 1;
+
+            if (!sorted.length) {
+                document.getElementById('zones-report-list').innerHTML = '<p style="text-align:center; opacity:0.5;">لا بيانات هذا الشهر</p>';
+                return;
+            }
+
+            document.getElementById('zones-report-list').innerHTML = sorted.map(([zone, cnt]) => {
+                const fillPct = Math.round((cnt / maxCnt) * 100);
+                return `
+                    <div style="margin-bottom:12px;">
+                        <div style="display:flex; justify-content:space-between; font-size:13px; font-weight:bold; margin-bottom:4px;">
+                            <span>📍 ${zone}</span><span style="color:var(--teal);">${cnt} زيارة</span>
+                        </div>
+                        <div style="height:8px; background:#f0f7fa; border-radius:4px; overflow:hidden;">
+                            <div style="width:${fillPct}%; height:100%; background:var(--teal); border-radius:4px; transition:width 0.8s ease;"></div>
+                        </div>
+                    </div>`;
+            }).join('');
+        }
     </script>
 </body>
 </html>

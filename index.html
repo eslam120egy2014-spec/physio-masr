@@ -741,6 +741,8 @@
             }
 
             // ---- Touch ----
+            let hasMoved = false;
+
             container.addEventListener('touchstart', (e) => {
                 const item = getItem(e.target);
                 if (!item) return;
@@ -749,29 +751,34 @@
                 startY = e.touches[0].clientY;
                 touchStartTime = Date.now();
                 longPressTriggered = false;
+                hasMoved = false;
                 activeEl = item;
                 longPressTimer = setTimeout(() => fireLP(name), DELAY);
-                // feedback بصري بعد 200ms
                 setTimeout(() => { if (longPressTimer && activeEl) activeEl.classList.add('longpress-active'); }, 200);
             }, { passive: true });
 
             container.addEventListener('touchmove', (e) => {
-                if (!longPressTimer) return;
                 const dx = Math.abs(e.touches[0].clientX - startX);
                 const dy = Math.abs(e.touches[0].clientY - startY);
-                if (dx > THRESHOLD || dy > THRESHOLD) cancelLP();
+                if (dx > THRESHOLD || dy > THRESHOLD) {
+                    hasMoved = true;
+                    cancelLP();
+                }
             }, { passive: true });
 
             container.addEventListener('touchend', (e) => {
                 const wasLong = longPressTriggered;
+                const moved = hasMoved;
                 cancelLP();
-                if (!wasLong && (Date.now() - touchStartTime) < 400) {
+                hasMoved = false;
+                // بنفتح التفاصيل بس لو: مفيش scroll، مفيش longpress، والوقت قصير
+                if (!wasLong && !moved && (Date.now() - touchStartTime) < 300) {
                     const item = getItem(e.target);
                     if (item) showCompDetails(item.dataset.name);
                 }
             });
 
-            container.addEventListener('touchcancel', cancelLP);
+            container.addEventListener('touchcancel', () => { cancelLP(); hasMoved = false; });
 
             // ---- Mouse (desktop) ----
             container.addEventListener('mousedown', (e) => {

@@ -2,2114 +2,963 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <meta name="description" content="نظام فيزيو مصر لإدارة زيارات التسويق - تتبع الزيارات والشركات والتقارير">
-    <meta name="theme-color" content="#023652">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <title>Physio Masr Elite V60</title>
-    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;900&display=swap" rel="stylesheet">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
-    <!-- SortableJS for drag and drop -->
-    <script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>StudioFlow - Premium Manager v5</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
-        :root { --navy: #023652; --teal: #1cb5b5; --bg: #f4f7f9; --card: #ffffff; --border: #e2e8f0; --neon-glow: 0 0 15px rgba(28, 181, 181, 0.6); --red: #ff4757; }
-        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-        *:focus { outline: 2px solid var(--teal); outline-offset: 2px; }
-        *:focus:not(:focus-visible) { outline: none; }
-        html { scroll-behavior: smooth; }
-        body { font-family: 'Cairo', sans-serif; background: var(--bg); margin: 0; color: #2d3748; padding-bottom: 100px; overflow-x: hidden; }
-
-        #splash-screen { position: fixed; inset: 0; background: var(--navy); z-index: 9999; display: none; flex-direction: column; align-items: center; justify-content: center; opacity: 1; transition: opacity 0.5s ease; }
-        .pulse-logo { width: 180px; height: auto; animation: pulse-anim 2s infinite ease-in-out; }
-        .welcome-text { margin-top: 15px; color: var(--teal); font-size: 24px; font-weight: 900; opacity: 0; animation: fadeInUp 0.8s forwards 0.5s; }
-        @keyframes pulse-anim { 0%, 100% { transform: scale(0.95); opacity: 0.9; } 50% { transform: scale(1.02); opacity: 1; } }
-        @keyframes fadeInUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
-        @keyframes slideIn { from { transform: translateX(-100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
-
-        header { background: var(--navy); height: 90px; display: grid; grid-template-columns: 1fr auto; align-items: center; padding: 0 20px; border-bottom: 3px solid var(--teal); position: sticky; top: 0; z-index: 1000; }
-        .header-logo { height: 60px; width: auto; justify-self: end; }
-        .user-tag { color: white; font-size: 15px; font-weight: 700; background: rgba(255,255,255,0.08); padding: 8px 15px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.1); cursor: pointer; }
-
-        .container { padding: 15px; max-width: 480px; margin: auto; }
-        .page { display: none; animation: fadeIn 0.3s ease; }
-        .page.active { display: block; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-
-        .card { background: var(--card); padding: 20px; border-radius: 18px; margin-bottom: 15px; border: 1px solid var(--border); box-shadow: 0 4px 6px rgba(0,0,0,0.02); }
-        label { display: flex; align-items: center; gap: 10px; font-size: 14px; font-weight: 700; color: var(--navy); margin-bottom: 10px; }
-        .label-icon { width: 18px; height: 18px; color: var(--teal); stroke-width: 2.5; fill: none; stroke: currentColor; }
-        .icon { width: 22px; height: 22px; stroke: currentColor; stroke-width: 2; fill: none; }
-
-        .input, select, textarea { 
-            width: 100%; 
-            padding: 12px 15px; 
-            border-radius: 12px; 
-            border: 1.5px solid var(--border); 
-            font-size: 14px; 
-            font-family: inherit; 
-            margin-bottom: 12px;
-            transition: all 0.3s ease;
+        :root { 
+            --bg-main: #f8fafc;
+            --accent: #6366f1;
         }
-        .input:focus, select:focus, textarea:focus {
-            border-color: var(--teal);
-            box-shadow: 0 0 0 3px rgba(28, 181, 181, 0.1);
-            outline: none;
-        }
-        .input::placeholder {
-            color: #aaa;
+        body {
+            font-family: 'IBM Plex Sans Arabic', sans-serif;
+            background-color: var(--bg-main);
+            margin: 0;
+            overflow: hidden;
+            user-select: none;
+            color: #1e293b;
         }
         
-        .dropdown { position: relative; display: inline-block; }
-        .dropdown-content { display: none; position: absolute; left: 0; background: white; min-width: 160px; box-shadow: 0 8px 16px rgba(0,0,0,0.1); border-radius: 12px; z-index: 2005; border: 1px solid var(--border); overflow: hidden; }
-        .dropdown-content button { width: 100%; padding: 12px; border: none; background: none; text-align: right; font-family: inherit; font-size: 13px; font-weight: bold; cursor: pointer; border-bottom: 1px solid #eee; }
-        .show { display: block; }
-
-        .cal-head { background: var(--navy); color: white; padding: 18px; display: flex; justify-content: space-between; align-items: center; border-radius: 18px 18px 0 0; }
-        .nav-btn { background: rgba(255,255,255,0.1); border: none; padding: 8px; border-radius: 10px; color: var(--teal); cursor: pointer; }
-        .cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); background: white; padding: 12px; border-radius: 0 0 18px 18px; border: 1px solid var(--border); text-align: center; }
-        .day { 
-            height: 42px; 
-            display: flex; 
-            align-items: center; 
-            justify-content: center; 
-            font-size: 14px; 
-            font-weight: 700; 
-            cursor: pointer; 
-            border-radius: 10px; 
+        /* Workspace Background */
+        .main-viewport {
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            padding: 0 12vw;
+            min-width: max-content;
             position: relative;
-            transition: all 0.2s ease;
-            color: #2d3748;
-        }
-        .day:hover {
-            background: #f0f7fa;
-        }
-        .day.selected { 
-            background: var(--teal); 
-            color: white; 
-            box-shadow: var(--neon-glow); 
-            transform: scale(1.15); 
-            z-index: 2; 
-        }
-        .day.has-v::after { 
-            content: ''; 
-            position: absolute; 
-            bottom: 5px; 
-            width: 6px; 
-            height: 6px; 
-            background: #f59e0b; 
-            border-radius: 50%;
-            box-shadow: 0 0 3px #f59e0b;
+            background: 
+                radial-gradient(circle at 10% 10%, rgba(99, 102, 241, 0.04) 0%, transparent 40%),
+                radial-gradient(circle at 90% 90%, rgba(168, 85, 247, 0.04) 0%, transparent 40%);
         }
 
-        nav { position: fixed; bottom: 0; left: 0; right: 0; background: white; height: 75px; display: flex; justify-content: space-around; align-items: center; border-top: 1px solid var(--border); z-index: 2000; }
-        .nav-link { color: #94a3b8; text-decoration: none; font-size: 11px; font-weight: 700; display: flex; flex-direction: column; align-items: center; gap: 5px; cursor: pointer; }
-        .nav-link.active { color: var(--teal); }
-
-        .btn-neon { 
-            background: var(--teal); 
-            color: white; 
-            border: none; 
-            padding: 16px; 
-            border-radius: 14px; 
-            font-weight: 900; 
-            width: 100%; 
-            box-shadow: var(--neon-glow); 
-            margin-top: 10px; 
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-        .btn-neon:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 0 20px rgba(28, 181, 181, 0.8);
-        }
-        .btn-neon:active {
-            transform: translateY(0);
-        }
-        .btn-neon:disabled {
-            opacity: 0.6;
-            cursor: not-allowed;
-            transform: none;
-        }
-        .btn-neon.loading {
+        /* Node / Squircle Styling */
+        .node-item {
+            display: flex;
+            align-items: center;
             position: relative;
-            color: transparent;
         }
-        .btn-neon.loading::after {
-            content: '';
-            position: absolute;
-            width: 20px;
-            height: 20px;
-            top: 50%;
-            left: 50%;
-            margin-left: -10px;
-            margin-top: -10px;
-            border: 3px solid rgba(255,255,255,0.3);
-            border-radius: 50%;
-            border-top-color: white;
-            animation: spin 0.8s linear infinite;
-        }
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
-        .btn-small { 
-            background: var(--teal); 
-            color: white; 
-            border: none; 
-            padding: 5px 10px; 
-            border-radius: 8px; 
-            font-size: 12px; 
-            font-weight: bold; 
+
+        .circle-container {
+            width: 180px;
+            height: 180px;
+            background: white;
+            border-radius: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 
+                0 10px 25px -5px rgba(0, 0, 0, 0.05),
+                0 40px 80px -15px rgba(0, 0, 0, 0.1);
+            border: 1px solid rgba(226, 232, 240, 0.8);
             cursor: pointer;
-            transition: all 0.2s ease;
+            transition: all 0.6s cubic-bezier(0.2, 1, 0.2, 1);
+            position: relative;
+            z-index: 10;
         }
-        .btn-small:hover {
-            opacity: 0.9;
-            transform: scale(1.05);
+
+        .circle-container:hover {
+            transform: scale(1.08) rotate(-2deg);
+            box-shadow: 0 50px 100px -20px rgba(99, 102, 241, 0.15);
+            border-color: var(--accent);
         }
-        
-        /* أزرار الإزالة النصية */
-        .delete-btn {
-            background: var(--red);
-            color: white;
-            border: none;
-            padding: 6px 12px;
-            border-radius: 8px;
-            font-size: 12px;
-            font-weight: bold;
-            cursor: pointer;
-            transition: opacity 0.2s;
-            white-space: nowrap;
-        }
-        .delete-btn.small {
-            padding: 4px 8px;
-            font-size: 11px;
-        }
-        .delete-btn:hover {
-            opacity: 0.9;
-        }
-        
-        #employee-hub { position: fixed; inset: 0; background: var(--bg); z-index: 4000; display: none; flex-direction: column; animation: slideUp 0.4s ease-out; }
-        @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
-        .hub-header { background: var(--navy); padding: 15px; color: white; border-bottom: 3px solid var(--teal); }
-        .hub-content { padding: 15px; overflow-y: auto; flex: 1; }
 
-        /* تنسيق تبويبات الهب */
-        .hub-tabs { display: flex; gap: 10px; margin-bottom: 15px; border-bottom: 1px solid var(--border); padding-bottom: 10px; }
-        .hub-tab { padding: 8px 16px; background: #eee; border-radius: 20px; font-size: 14px; font-weight: bold; cursor: pointer; }
-        .hub-tab.active { background: var(--teal); color: white; }
-        .hub-tab-content { display: none; }
-        .hub-tab-content.active { display: block; }
-
-        .stat-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 20px; }
-        .stat-box { background: white; padding: 15px; border-radius: 18px; border: 1px solid var(--border); text-align: center; }
-        .stat-val { display: block; font-size: 24px; font-weight: 900; color: var(--teal); }
-        .stat-lbl { font-size: 11px; font-weight: 700; color: var(--navy); opacity: 0.8; }
-
-        .progress-container { background: rgba(255,255,255,0.15); border-radius: 10px; height: 10px; margin: 10px 0; overflow: hidden; }
-        .progress-bar { background: var(--teal); height: 100%; width: 0%; transition: 1.5s cubic-bezier(0.4, 0, 0.2, 1); }
-        .tag-list { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
-        .tag-item { background: var(--navy); color: white; padding: 6px 12px; border-radius: 10px; font-size: 11px; font-weight: bold; }
-
-        /* Checkbox group styles */
-        .days-checkbox-group { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 15px; background: #f9f9f9; padding: 10px; border-radius: 12px; }
-        .days-checkbox-group label { display: inline-flex; align-items: center; gap: 5px; font-size: 13px; font-weight: normal; margin-bottom: 0; cursor: pointer; }
-        .planned-day-badge { background: var(--teal); color: white; padding: 2px 8px; border-radius: 12px; font-size: 10px; font-weight: bold; margin-left: 5px; }
-        .company-item { cursor: pointer; transition: 0.2s; touch-action: pan-y; user-select: none; -webkit-tap-highlight-color: transparent; }
-        .company-item:active { background: #f0f0f0; }
-
-        /* تنسيقات صفحة التحكم داخل الهب */
-        .admin-day-tab { padding: 8px 12px; background: #eee; border-radius: 20px; font-size: 12px; font-weight: bold; cursor: pointer; white-space: nowrap; }
-        .admin-day-tab.active { background: var(--teal); color: white; }
-        .plan-company-row { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; background: white; padding: 10px; border-radius: 12px; border: 1px solid var(--border); cursor: grab; }
-        .plan-company-row:active { cursor: grabbing; }
-        .plan-company-info { flex: 1; cursor: pointer; }
-        .drag-handle { font-size: 20px; color: #aaa; margin-left: 5px; }
-
-        /* تحسين التمرير في صفحة البيانات */
-        .company-list-scroll { max-height: 70vh; overflow-y: auto; padding-left: 5px; -webkit-overflow-scrolling: touch; }
-        .planned-company-item { cursor: pointer; transition: transform 0.2s, box-shadow 0.2s; user-select: none; }
-        .planned-company-item:active { transform: scale(0.98); box-shadow: 0 2px 8px rgba(0,0,0,0.15); }
-        .company-item { cursor: pointer; transition: transform 0.2s; user-select: none; }
-        .company-item:active { transform: scale(0.98); }
-
-        /* تنسيق قائمة الاختيار المتعدد في التحكم */
-        .multi-select-list { max-height: 250px; overflow-y: auto; border: 1px solid var(--border); border-radius: 12px; padding: 10px; margin: 10px 0; background: #f9f9f9; }
-        .multi-select-item { display: flex; align-items: center; gap: 8px; padding: 8px; border-bottom: 1px solid #eee; }
-        .multi-select-item:last-child { border-bottom: none; }
-        .multi-select-item input[type="checkbox"] { width: 18px; height: 18px; }
-
-        /* تنسيق عرض المسؤولين في خطة اليوم */
-        .persons-list { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 5px; font-size: 12px; color: var(--navy); }
-        .person-badge { background: #f0f7fa; padding: 2px 8px; border-radius: 12px; display: inline-flex; align-items: center; gap: 3px; }
-        .add-person-btn { background: none; border: 1px dashed var(--teal); color: var(--teal); border-radius: 50%; width: 24px; height: 24px; display: inline-flex; align-items: center; justify-content: center; font-size: 16px; cursor: pointer; margin-right: 5px; }
-
-        /* تنسيق صف المسؤول في التعديل مع زر إزالة */
-        .person-edit-row { display: flex; gap: 5px; margin-bottom: 8px; align-items: center; }
-        .person-edit-row select { width: 85px; }
-        .person-edit-row input[type="text"] { flex: 2; }
-        .person-edit-row input[type="tel"] { flex: 1.5; }
-
-        /* تحسين تنسيق PDF */
-        .pdf-container { font-family: 'Cairo', sans-serif; padding: 30px; background: white; direction: rtl; }
-        .pdf-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 3px solid var(--teal); padding-bottom: 15px; margin-bottom: 20px; }
-        .pdf-header h1 { color: var(--navy); margin: 0; font-size: 24px; }
-        .pdf-header img { height: 70px; }
-        .pdf-info { display: flex; justify-content: space-between; background: #f0f7fa; padding: 15px; border-radius: 12px; margin-bottom: 20px; font-size: 14px; }
-        .pdf-table { width: 100%; border-collapse: collapse; border-radius: 12px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
-        .pdf-table th { background: var(--navy); color: white; padding: 12px; font-weight: 700; font-size: 14px; }
-        .pdf-table td { padding: 12px; border-bottom: 1px solid #eee; font-size: 13px; }
-        .pdf-table tr:nth-child(even) { background: #f9f9f9; }
-        .pdf-footer { margin-top: 30px; text-align: center; color: #888; font-size: 12px; border-top: 1px solid #ddd; padding-top: 15px; }
-
-        /* تنسيق رأس مودال التعديل مع زر الإزالة */
-        .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
-        .modal-header h3 { margin: 0; color: var(--navy); }
-
-        /* Toast notifications */
-        .toast-container {
-            position: fixed;
-            top: 100px;
-            left: 50%;
-            transform: translateX(-50%);
-            z-index: 10000;
+        .inner-fill {
+            width: calc(100% - 14px);
+            height: calc(100% - 14px);
+            border-radius: 54px;
             display: flex;
             flex-direction: column;
-            gap: 10px;
-            width: 90%;
-            max-width: 350px;
-        }
-        .toast {
-            background: var(--navy);
+            align-items: center;
+            justify-content: center;
             color: white;
-            padding: 14px 20px;
+            pointer-events: none;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .inner-fill::after {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: linear-gradient(180deg, rgba(255,255,255,0.15) 0%, transparent 100%);
+        }
+
+        /* Dashed Paths */
+        .link-path {
+            width: 140px;
+            height: 2px;
+            display: flex;
+            align-items: center;
+            position: relative;
+        }
+
+        .path-line {
+            width: 100%;
+            height: 2px;
+            border-top: 2px dashed #cbd5e1;
+            position: relative;
+        }
+
+        /* Calendar Styling */
+        .calendar-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 4px;
+        }
+        .calendar-day {
+            aspect-ratio: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
             border-radius: 12px;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+            font-size: 0.75rem;
+            font-weight: 600;
+            transition: all 0.2s;
+        }
+        .day-booked {
+            background: #6366f1;
+            color: white;
+            box-shadow: 0 4px 10px rgba(99, 102, 241, 0.3);
+        }
+        .day-empty {
+            background: #f8fafc;
+            color: #94a3b8;
+        }
+        .day-header {
+            color: #64748b;
+            font-size: 0.65rem;
+            font-weight: 800;
+            text-transform: uppercase;
+        }
+
+        /* Nav & Panels */
+        .nav-blur {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.8);
+        }
+
+        #panel {
+            position: fixed;
+            inset: 0;
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(40px);
+            z-index: 2000;
+            display: none;
+            flex-direction: column;
+        }
+
+        .btn-premium {
+            background: linear-gradient(135deg, #1e1b4b 0%, #312e81 100%);
+            color: white;
+            padding: 14px 28px;
+            border-radius: 20px;
+            font-weight: 700;
+            transition: all 0.3s;
             display: flex;
             align-items: center;
             gap: 10px;
-            animation: slideDown 0.3s ease;
-            font-weight: bold;
-            font-size: 14px;
+            box-shadow: 0 10px 20px rgba(30, 27, 75, 0.15);
         }
-        .toast.success { border-right: 4px solid #22c55e; }
-        .toast.error { border-right: 4px solid var(--red); }
-        .toast.warning { border-right: 4px solid #f59e0b; }
-        @keyframes slideDown {
-            from { opacity: 0; transform: translateX(-50%) translateY(-20px); }
-            to { opacity: 1; transform: translateX(-50%) translateY(0); }
+        .btn-premium:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 15px 30px rgba(30, 27, 75, 0.25);
         }
-        
-        /* ===== تطويرات V60 ===== */
 
-        /* صفحة التقارير */
-        .report-section { margin-bottom: 20px; }
-        .report-title { font-size: 15px; font-weight: 900; color: var(--navy); margin-bottom: 12px; display: flex; align-items: center; gap: 8px; }
-        
-        /* مقارنة الأسابيع */
-        .week-compare-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-        .week-box { background: white; border-radius: 14px; padding: 14px; border: 1px solid var(--border); text-align: center; }
-        .week-box.current { border-color: var(--teal); border-width: 2px; }
-        .week-box-num { font-size: 28px; font-weight: 900; color: var(--teal); }
-        .week-box-lbl { font-size: 11px; color: #888; font-weight: 700; }
-        .week-change { font-size: 12px; font-weight: bold; margin-top: 4px; }
-        .week-change.up { color: #22c55e; }
-        .week-change.down { color: var(--red); }
-        .week-change.same { color: #888; }
+        /* Tabs Styling */
+        .tab-btn {
+            flex: 1;
+            padding: 1.5rem;
+            font-size: 0.875rem;
+            font-weight: 900;
+            border-bottom: 4px solid transparent;
+            transition: all 0.3s;
+        }
+        .tab-btn.active {
+            color: #6366f1;
+            border-bottom-color: #6366f1;
+        }
+        .tab-btn:not(.active) {
+            color: #cbd5e1;
+        }
 
-        /* شريط مقارنة أيام الأسبوع */
-        .days-bar-container { display: flex; gap: 6px; align-items: flex-end; height: 80px; padding: 0 5px; }
-        .day-bar-wrap { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 4px; height: 100%; justify-content: flex-end; }
-        .day-bar { width: 100%; background: var(--teal); border-radius: 6px 6px 0 0; min-height: 4px; transition: height 0.6s cubic-bezier(0.4,0,0.2,1); }
-        .day-bar.prev { background: #e2e8f0; }
-        .day-bar-label { font-size: 10px; font-weight: 700; color: #888; }
-        .day-bar-num { font-size: 11px; font-weight: 900; color: var(--navy); }
+        /* Tenant Card */
+        .tenant-card {
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 24px;
+            padding: 20px;
+            margin-bottom: 12px;
+            transition: all 0.3s;
+        }
+        .tenant-card:hover {
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            border-color: #6366f1;
+        }
 
-        /* شركات لم تُزار */
-        .unvisited-item { display: flex; justify-content: space-between; align-items: center; padding: 10px 14px; background: white; border-radius: 12px; margin-bottom: 8px; border: 1px solid var(--border); }
-        .unvisited-badge { font-size: 11px; font-weight: bold; padding: 3px 10px; border-radius: 20px; }
-        .unvisited-badge.danger { background: #fff0f0; color: var(--red); }
-        .unvisited-badge.warning { background: #fffbeb; color: #d97706; }
-        .unvisited-badge.ok { background: #f0fdf4; color: #16a34a; }
+        /* Invoice */
+        .invoice-item {
+            background: #f8fafc;
+            border-radius: 16px;
+            padding: 16px;
+            margin-bottom: 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-left: 4px solid #6366f1;
+        }
+        .invoice-item.paid {
+            border-left-color: #10b981;
+            background: #ecfdf5;
+        }
+        .invoice-item.pending {
+            border-left-color: #f59e0b;
+            background: #fffbeb;
+        }
 
-        /* متابعة المنتجات */
-        .product-tag { display: inline-flex; align-items: center; gap: 5px; background: #f0f7fa; border: 1px solid #d0e8f0; padding: 4px 10px; border-radius: 20px; font-size: 12px; font-weight: bold; color: var(--navy); margin: 3px; }
-        .product-tag button { background: none; border: none; color: #888; cursor: pointer; font-size: 14px; line-height: 1; padding: 0; }
-        .product-input-row { display: flex; gap: 8px; margin-bottom: 10px; }
-        .product-input-row input { flex: 1; margin-bottom: 0; }
-        .product-input-row button { white-space: nowrap; padding: 10px 14px; background: var(--teal); color: white; border: none; border-radius: 10px; font-weight: bold; cursor: pointer; font-family: inherit; }
+        /* Notification */
+        .notification {
+            position: fixed;
+            top: 120px;
+            right: 24px;
+            background: white;
+            border-radius: 20px;
+            padding: 16px 24px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+            z-index: 5000;
+            animation: slideIn 0.3s ease-out;
+            max-width: 300px;
+        }
+        @keyframes slideIn {
+            from { transform: translateX(400px); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+        @keyframes slideOut {
+            to { transform: translateX(400px); opacity: 0; }
+        }
+        .notification.remove {
+            animation: slideOut 0.3s ease-out forwards;
+        }
 
-        /* أكثر الشركات زيارة */
-        .top-company-row { display: flex; align-items: center; gap: 10px; padding: 10px; background: white; border-radius: 12px; margin-bottom: 8px; border: 1px solid var(--border); }
-        .top-company-rank { width: 28px; height: 28px; border-radius: 50%; background: var(--navy); color: white; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 900; flex-shrink: 0; }
-        .top-company-rank.gold { background: linear-gradient(135deg, #f59e0b, #fbbf24); }
-        .top-company-rank.silver { background: linear-gradient(135deg, #94a3b8, #cbd5e1); }
-        .top-company-rank.bronze { background: linear-gradient(135deg, #b45309, #d97706); }
-        .top-company-info { flex: 1; }
-        .top-company-bar { height: 6px; background: #f0f7fa; border-radius: 3px; margin-top: 4px; overflow: hidden; }
-        .top-company-fill { height: 100%; background: var(--teal); border-radius: 3px; }
-
-        /* نشاط الهب - تبويب جديد */
-        .hub-tab { padding: 8px 14px; background: #eee; border-radius: 20px; font-size: 13px; font-weight: bold; cursor: pointer; white-space: nowrap; }
-        .hub-tab.active { background: var(--teal); color: white; }
-
-        /* تحسين بطاقات الإحصائيات */
-        .stat-box { position: relative; overflow: hidden; }
-        .stat-box::before { content: ''; position: absolute; top: -10px; right: -10px; width: 60px; height: 60px; background: var(--teal); opacity: 0.05; border-radius: 50%; }
+        /* Login Screen */
+        .login-container {
+            position: fixed;
+            inset: 0;
+            background: linear-gradient(135deg, #1e1b4b 0%, #312e81 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+        }
+        .login-box {
+            background: white;
+            border-radius: 32px;
+            padding: 40px;
+            width: 100%;
+            max-width: 400px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        }
     </style>
 </head>
 <body>
 
-    <div id="toast-container" class="toast-container" aria-live="polite"></div>
-
-    <div id="splash-screen" role="alert" aria-live="polite">
-        <img src="https://j.top4top.io/p_3692l51ap0.png" class="pulse-logo" alt="شعار فيزيو مصر">
-        <div id="splash-user-text" class="welcome-text"></div>
+    <!-- Login Screen -->
+    <div id="login-screen" class="login-container">
+        <div class="login-box">
+            <div class="text-center mb-8">
+                <div class="w-16 h-16 bg-indigo-600 rounded-3xl flex items-center justify-center text-white mx-auto mb-4 shadow-lg">
+                    <i data-lucide="layout-grid" size="32"></i>
+                </div>
+                <h1 class="text-3xl font-black text-slate-900">StudioFlow</h1>
+                <p class="text-slate-400 text-sm mt-2">نظام إدارة الشقق والحجوزات الاحترافي</p>
+            </div>
+            
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-sm font-black text-slate-600 mb-2">اسم المستخدم</label>
+                    <input type="text" id="login-username" placeholder="ادخل اسم المستخدم" class="w-full bg-slate-50 border border-slate-200 rounded-2xl p-3 outline-none focus:border-indigo-500 focus:bg-white transition-all">
+                </div>
+                <div>
+                    <label class="block text-sm font-black text-slate-600 mb-2">كلمة المرور</label>
+                    <input type="password" id="login-password" placeholder="ادخل كلمة المرور" class="w-full bg-slate-50 border border-slate-200 rounded-2xl p-3 outline-none focus:border-indigo-500 focus:bg-white transition-all">
+                </div>
+                <button onclick="handleLogin()" class="w-full bg-indigo-600 text-white font-black py-3 rounded-2xl hover:bg-indigo-700 transition-all mt-6 flex items-center justify-center gap-2">
+                    <i data-lucide="login" size="18"></i> دخول
+                </button>
+                <button onclick="toggleSignup()" class="w-full bg-slate-100 text-slate-600 font-black py-3 rounded-2xl hover:bg-slate-200 transition-all">
+                    إنشاء حساب جديد
+                </button>
+            </div>
+            
+            <p class="text-center text-slate-400 text-xs mt-6">معلومات تجريبية: admin / 123456</p>
+        </div>
     </div>
 
-    <div id="login-screen" style="position:fixed; inset:0; background:var(--navy); z-index:9000; display:none; flex-direction:column; align-items:center; justify-content:center; padding:20px;" role="dialog" aria-labelledby="login-title">
-        <img src="https://j.top4top.io/p_3692l51ap0.png" style="width:200px; margin-bottom:40px;" alt="شعار فيزيو مصر">
-        <h2 id="login-title" style="color:white; margin-bottom:20px; font-size:18px;">مرحباً بك في فيزيو مصر</h2>
-        <label for="user-input" style="color:white; margin-bottom:8px; font-size:14px;">اسم موظف التسويق</label>
-        <input type="text" id="user-input" class="input" placeholder="ادخل اسم موظف التسويق" style="max-width:300px; text-align:center;" autocomplete="name" required>
-        <button onclick="firstTimeLogin()" class="btn-neon" style="max-width:300px;">دخول للتطبيق</button>
-    </div>
+    <!-- Header -->
+    <header class="fixed top-0 left-0 right-0 h-24 flex items-center justify-between px-12 z-[100] pointer-events-none">
+        <div class="nav-blur px-6 py-3 rounded-3xl shadow-sm flex items-center gap-4 pointer-events-auto">
+            <div class="w-10 h-10 bg-indigo-600 rounded-2xl flex items-center justify-center text-white shadow-lg">
+                <i data-lucide="layout-grid" size="20"></i>
+            </div>
+            <div>
+                <h1 class="text-lg font-black text-slate-800 leading-none">StudioFlow</h1>
+                <span class="text-[9px] text-indigo-500 font-black uppercase tracking-widest">Premium Workspace</span>
+            </div>
+        </div>
 
-    <header id="app-header" style="display:none;" role="banner">
-        <div id="user-display" class="user-tag" onclick="toggleHub(true)" role="button" tabindex="0" aria-label="فتح لوحة الإحصائيات"></div>
-        <img src="https://j.top4top.io/p_3692l51ap0.png" class="header-logo" alt="فيزيو مصر">
+        <div class="flex gap-4 pointer-events-auto">
+            <div class="nav-blur px-8 py-3 rounded-3xl shadow-sm flex flex-col justify-center items-center">
+                <span id="global-income" class="text-xl font-black text-indigo-600">0</span>
+                <span class="text-[8px] text-slate-400 font-bold uppercase">إجمالي المحفظة</span>
+            </div>
+            <button onclick="showReports()" class="nav-blur text-slate-600 px-6 py-3 rounded-3xl shadow-sm font-black hover:text-indigo-600 transition-all flex items-center gap-2 pointer-events-auto">
+                <i data-lucide="bar-chart-3" size="18"></i> التقارير
+            </button>
+            <div class="nav-blur px-6 py-3 rounded-3xl shadow-sm flex items-center gap-4 pointer-events-auto">
+                <div class="text-right text-sm">
+                    <p id="current-user" class="font-black text-slate-800">---</p>
+                    <span class="text-[9px] text-slate-400 font-bold">مدير النظام</span>
+                </div>
+                <button onclick="handleLogout()" class="text-slate-400 hover:text-rose-500 transition-all">
+                    <i data-lucide="log-out" size="18"></i>
+                </button>
+            </div>
+            <button onclick="addUnitPrompt()" class="bg-slate-900 text-white px-8 py-3 rounded-3xl font-black flex items-center gap-2 hover:scale-105 transition-all">
+                <i data-lucide="plus" size="18"></i> وحدة جديدة
+            </button>
+        </div>
     </header>
 
-    <!-- لوحة الإحصائيات الذكية (Hub) -->
-    <div id="employee-hub">
-        <div class="hub-header">
-            <div style="display:flex; justify-content:space-between; align-items:center;">
-                <span style="font-weight: 900; font-size: 18px;">لوحة الإحصائيات الذكية</span>
-                <button onclick="toggleHub(false)" style="background:none; border:none; color:white; font-size:28px;">×</button>
+    <!-- Workspace -->
+    <div id="workspace" class="main-viewport"></div>
+
+    <!-- Empty State -->
+    <div id="empty-view" class="fixed inset-0 flex flex-col items-center justify-center opacity-0 pointer-events-none transition-opacity duration-700">
+        <div class="w-24 h-24 bg-white border border-slate-100 rounded-[45px] shadow-xl flex items-center justify-center mb-6 text-indigo-500">
+            <i data-lucide="plus" size="32"></i>
+        </div>
+        <h2 class="text-3xl font-black text-slate-800 mb-2">ابدأ التنظيم</h2>
+        <p class="text-slate-400 font-medium mb-10">قم بإضافة أول وحدة عقارية لبناء نظامك</p>
+        <button onclick="addUnitPrompt()" class="btn-premium">إضافة وحدة</button>
+    </div>
+
+    <!-- Detail Panel -->
+    <div id="panel">
+        <div class="p-12 flex justify-between items-center border-b border-slate-100">
+            <div class="flex items-center gap-8">
+                <div id="p-icon" class="w-24 h-24 rounded-[42px] shadow-2xl flex items-center justify-center text-white">
+                    <i data-lucide="home" size="40"></i>
+                </div>
+                <div>
+                    <h2 id="p-name" class="text-5xl font-black text-slate-900 tracking-tighter">---</h2>
+                    <div class="flex gap-3 mt-2">
+                        <span class="bg-emerald-50 text-emerald-600 px-3 py-1 rounded-full text-[10px] font-black uppercase">نشط</span>
+                        <span id="p-id" class="text-slate-300 text-[10px] font-black uppercase self-center">Node: #000000</span>
+                    </div>
+                </div>
+            </div>
+            <div class="flex gap-4">
+                <button onclick="showBookingForm()" class="btn-premium">
+                    <i data-lucide="calendar-plus" size="20"></i> حجز جديد
+                </button>
+                <button onclick="showTenantForm()" class="btn-premium">
+                    <i data-lucide="users" size="20"></i> مستأجر جديد
+                </button>
+                <button onclick="closePanel()" class="w-16 h-16 bg-slate-100 rounded-3xl flex items-center justify-center text-slate-400 hover:bg-rose-500 hover:text-white transition-all">
+                    <i data-lucide="x" size="28"></i>
+                </button>
             </div>
         </div>
-        <!-- تبويبات الهب -->
-        <div class="hub-tabs" style="padding: 0 15px;">
-            <div class="hub-tab active" onclick="switchHubTab('stats')">📊 الإحصائيات</div>
-            <div class="hub-tab" onclick="switchHubTab('control')">🛠️ التحكم</div>
-        </div>
-        <div class="hub-content">
-            <!-- محتوى تبويب الإحص��ئيات -->
-            <div id="hub-stats" class="hub-tab-content active">
-                <div class="stat-grid">
-                    <div class="stat-box"><span id="st-visits" class="stat-val">0</span><span class="stat-lbl">زيارات هذا الشهر</span></div>
-                    <div class="stat-box"><span id="st-comps" class="stat-val">0</span><span class="stat-lbl">عملاء مميزين</span></div>
-                </div>
 
-                <div class="card" style="border: none; background: linear-gradient(135deg, #023652 0%, #054a6d 100%); color: white;">
-                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 8px;">
-                        <div style="display:flex; align-items:center; gap:12px;">
-                            <div style="background: rgba(28, 181, 181, 0.2); padding: 8px; border-radius: 12px; display: flex;">
-                                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#1cb5b5" stroke-width="2.5"><circle cx="12" cy="12" r="10"></circle><circle cx="12" cy="12" r="6"></circle><circle cx="12" cy="12" r="2"></circle></svg>
-                            </div>
-                            <span style="font-weight: 900; font-size: 15px;">هدف الزيارات الشهري</span>
+        <div class="flex-1 overflow-hidden flex">
+            <!-- Sidebar: Stats & Calendar -->
+            <div class="w-[420px] border-l border-slate-50 p-12 space-y-8 overflow-y-auto bg-white/50">
+                <!-- Stats -->
+                <div class="bg-slate-900 p-8 rounded-[40px] text-white shadow-2xl">
+                    <span class="text-[10px] font-black opacity-40 uppercase tracking-widest">الوضع المالي</span>
+                    <h3 id="stat-income" class="text-4xl font-black mt-4">0</h3>
+                    <div class="grid grid-cols-2 gap-4 mt-8 pt-8 border-t border-white/10">
+                        <div>
+                            <span class="text-[9px] opacity-40 font-bold uppercase">المصروفات</span>
+                            <p id="stat-costs" class="font-black text-rose-400 text-lg">0</p>
                         </div>
-                        <span id="target-pct" style="font-weight: 900; color: var(--teal); background: white; padding: 2px 8px; border-radius: 8px; font-size: 12px;">0%</span>
-                    </div>
-                    <div class="progress-container"><div id="target-bar" class="progress-bar"></div></div>
-                    <div style="display:flex; justify-content:space-between; margin-top:8px; font-size:11px; font-weight:bold; opacity:0.8;">
-                        <span>نسبة الإنجاز</span>
-                        <span>المستهدف: 60 زيارة</span>
+                        <div>
+                            <span class="text-[9px] opacity-40 font-bold uppercase">الصافي</span>
+                            <p id="stat-net" class="font-black text-emerald-400 text-lg">0</p>
+                        </div>
                     </div>
                 </div>
 
-                <div class="card">
-                    <label><svg class="label-icon" viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg> أكثر المناطق نشاطاً هذا الشهر</label>
-                    <div id="top-zones" class="tag-list"></div>
+                <!-- Calendar View -->
+                <div class="bg-white p-8 rounded-[40px] border border-slate-100 shadow-sm">
+                    <div class="flex justify-between items-center mb-6">
+                        <h4 class="font-black text-slate-800 text-sm">تقويم الحجوزات</h4>
+                        <span class="text-[10px] font-black text-indigo-500" id="cal-month-year">May 2024</span>
+                    </div>
+                    <div class="calendar-grid mb-2">
+                        <div class="day-header text-center">ح</div>
+                        <div class="day-header text-center">ن</div>
+                        <div class="day-header text-center">ث</div>
+                        <div class="day-header text-center">ر</div>
+                        <div class="day-header text-center">خ</div>
+                        <div class="day-header text-center">ج</div>
+                        <div class="day-header text-center">س</div>
+                    </div>
+                    <div id="calendar-body" class="calendar-grid"></div>
                 </div>
 
-                <button onclick="downloadMonthlyPDF()" class="btn-neon" style="background:var(--navy); margin-top:20px;">📄 تحميل تقرير الشهر بالكامل PDF</button>
+                <button onclick="addExpensePrompt()" class="w-full py-5 rounded-3xl border-2 border-dashed border-slate-200 text-slate-400 font-bold hover:border-indigo-500 hover:text-indigo-500 transition-all flex items-center justify-center gap-3">
+                    <i data-lucide="tag" size="18"></i> إضافة مصروف
+                </button>
             </div>
 
-            <!-- محتوى تبويب التحكم (مع خاصية الاختيار المتعدد ومنع التكرار) -->
-            <div id="hub-control" class="hub-tab-content">
-                <div class="card">
-                    <h3 style="color:var(--navy); display:flex; align-items:center; gap:8px;"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg> التحكم في خطة الأسبوع</h3>
+            <!-- Content Area: Tables -->
+            <div class="flex-1 p-12 overflow-y-auto">
+                <div class="bg-white rounded-[45px] shadow-sm border border-slate-100 overflow-hidden">
+                    <div class="flex border-b border-slate-50">
+                        <button onclick="switchTab('bookings')" class="tab-btn active" id="btn-tab-b">سجل الحجوزات</button>
+                        <button onclick="switchTab('tenants')" class="tab-btn" id="btn-tab-t">المستأجرين</button>
+                        <button onclick="switchTab('invoices')" class="tab-btn" id="btn-tab-i">الفواتير</button>
+                        <button onclick="switchTab('expenses')" class="tab-btn" id="btn-tab-e">المصروفات</button>
+                    </div>
                     
-                    <!-- تبويبات الأيام -->
-                    <div style="display:flex; gap:8px; overflow-x:auto; padding:10px 0; margin-bottom:10px;" id="admin-days-tabs"></div>
+                    <div id="tab-bookings" class="p-8">
+                        <table class="w-full text-right">
+                            <tbody id="table-bookings"></tbody>
+                        </table>
+                    </div>
 
-                    <!-- قائمة الشركات المختارة لهذا اليوم (قابلة للسحب) -->
-                    <p style="font-weight:bold;">الشركات المقررة (اسحب لإعادة الترتيب):</p>
-                    <div id="admin-company-list" class="company-list-scroll" style="padding:5px; max-height: 250px;"></div>
+                    <div id="tab-tenants" class="p-8 hidden">
+                        <div id="list-tenants" class="space-y-4"></div>
+                    </div>
 
-                    <!-- قسم إضافة شركات متعددة مع منع التكرار -->
-                    <p style="font-weight:bold; margin-top:15px;">إضافة شركات لليوم:</p>
-                    <div class="multi-select-list" id="multi-select-companies"></div>
-                    <button onclick="addSelectedCompanies()" class="btn-neon" style="margin-top:10px;">➕ إضافة المحددة لليوم</button>
-                    <p style="font-size:12px; color:#888; margin-top:5px;">الشركات التي تظهر هي غير المضافة لهذا اليوم فقط.</p>
-                </div>
-            </div>
-        </div>
-    </div>
+                    <div id="tab-invoices" class="p-8 hidden">
+                        <div id="list-invoices" class="space-y-4"></div>
+                    </div>
 
-    <div class="container" id="app-content" style="display:none;">
-        <!-- الصفحة الرئيسية (خطة اليوم) -->
-        <div id="p-home" class="page active">
-            <div class="cal-head">
-                <button class="nav-btn" onclick="moveMonth(-1)"><svg style="width:20px;height:20px" viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6" stroke="currentColor" stroke-width="3"/></svg></button>
-                <span id="month-label" style="font-weight:900;"></span>
-                <button class="nav-btn" onclick="moveMonth(1)"><svg style="width:20px;height:20px" viewBox="0 0 24 24"><path d="M9 18l6-6-6-6" stroke="currentColor" stroke-width="3"/></svg></button>
-            </div>
-            <div class="cal-grid" id="calendar"></div>
-            
-            <!-- خطة اليوم (الشركات المقررة) -->
-            <h3 style="font-size:18px; margin:20px 0 10px 0; color:var(--navy);">📋 خطة اليوم</h3>
-            <div id="planned-visits" style="margin-top:10px;"></div>
-
-            <!-- الزيارات المنفذة اليوم -->
-            <div style="display:flex; justify-content:space-between; align-items:center; margin-top:25px;">
-                <h3 style="font-size:18px; margin:0; color:var(--navy);">زيارات اليوم</h3>
-                <div class="dropdown">
-                    <button onclick="toggleDrop()" style="background:var(--navy); color:white; border:none; padding:8px 15px; border-radius:10px; font-weight:bold; font-size:12px;">مشاركة التقرير ▼</button>
-                    <div id="reportDrop" class="dropdown-content">
-                        <button onclick="shareWA()">🟢 WhatsApp</button>
-                        <button onclick="downloadPDF()">📄 ملف PDF اليوم</button>
+                    <div id="tab-expenses" class="p-8 hidden">
+                        <div id="list-expenses" class="space-y-4"></div>
                     </div>
                 </div>
             </div>
-            <div id="daily-visits" style="margin-top:15px;"></div>
-        </div>
-
-        <!-- صفحة إضافة شركة جديدة -->
-        <div id="p-add" class="page">
-            <div class="card">
-                <label><svg class="label-icon" viewBox="0 0 24 24"><path d="M3 21h18M3 7l9-4 9 4v10H3V7z"/></svg> اسم الشركة الجديدة</label>
-                <input type="text" id="comp-name" list="comp-dl" class="input" placeholder="اسم الشركة">
-                <datalist id="comp-dl"></datalist>
-                
-                <label><svg class="label-icon" viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg> المنطقة</label>
-                <select id="comp-zone" class="input" onchange="checkNewZone(this)"></select>
-
-                <!-- أيام الزيارة المقررة (اختياري) -->
-                <label><svg class="label-icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> أيام الزيارة المقررة (اختياري)</label>
-                <div class="days-checkbox-group" id="plan-days-checkboxes"></div>
-
-                <label><svg class="label-icon" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg> بيانات المسؤولين</label>
-                <div id="persons-container"></div>
-                <button onclick="addPerson()" type="button" style="width:100%; border:1px solid #ddd; padding:8px; border-radius:10px; margin-bottom:15px; font-size:12px; background:none;">+ إضافة مسؤول</button>
-
-                <!-- ملاحظات عامة -->
-                <label><svg class="label-icon" viewBox="0 0 24 24"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg> ملاحظات عامة (اختياري)</label>
-                <textarea id="comp-general-notes" class="input" rows="2"></textarea>
-
-                <input type="hidden" id="v-location">
-                <p id="gps-status" style="font-size:11px; color:var(--teal); text-align:center; margin-top:-10px;"></p>
-                
-                <button onclick="saveNewCompany()" class="btn-neon">➕ إضافة شركة جديدة</button>
-            </div>
-        </div>
-
-        <!-- صفحة البيانات (عرض الشركات) مع تحسين التمرير -->
-        <div id="p-data" class="page">
-            <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px; margin-bottom:15px;">
-                <button onclick="exportData()" style="padding:10px; border-radius:10px; border:1px solid #ddd; background:white; font-size:12px; font-weight:bold;">نسخة احتياطية</button>
-                <button onclick="document.getElementById('imp-f').click()" style="padding:10px; border-radius:10px; border:1px solid #ddd; background:white; font-size:12px; font-weight:bold;">استيراد بيانات</button>
-                <input type="file" id="imp-f" style="display:none" onchange="importData(event)">
-            </div>
-            <input type="text" id="comp-search" class="input" placeholder="بحث باسم الشركة أو المنطقة..." oninput="debounceSearch()" aria-label="البحث في الشركات">
-            <div id="company-list" class="company-list-scroll"></div>
-        </div>
-
-        <!-- صفحة التقارير والإحصائيات V60 -->
-        <div id="p-reports" class="page">
-            <!-- مقارنة الأسبوع الحالي بالسابق -->
-            <div class="card report-section">
-                <div class="report-title">📊 مقارنة الأسابيع</div>
-                <div class="week-compare-grid" id="week-compare-grid"></div>
-                <div style="margin-top:15px;">
-                    <div style="font-size:12px; color:#888; font-weight:bold; margin-bottom:8px;">زيارات كل يوم — هذا الأسبوع 🟦 | الماضي ⬜</div>
-                    <div class="days-bar-container" id="days-bar-chart"></div>
-                </div>
-            </div>
-
-            <!-- أكثر الشركات زيارة -->
-            <div class="card report-section">
-                <div class="report-title">🏆 أكثر الشركات زيارةً (هذا الشهر)</div>
-                <div id="top-companies-list"></div>
-            </div>
-
-            <!-- شركات تحتاج متابعة -->
-            <div class="card report-section">
-                <div class="report-title">⚠️ شركات تحتاج متابعة</div>
-                <div style="font-size:12px; color:#888; margin-bottom:10px;">مرتبة حسب آخر زيارة (الأقدم أولاً)</div>
-                <div id="unvisited-companies-list"></div>
-            </div>
-
-            <!-- تقرير المناطق -->
-            <div class="card report-section">
-                <div class="report-title">📍 أداء المناطق (هذا الشهر)</div>
-                <div id="zones-report-list"></div>
-            </div>
         </div>
     </div>
 
-    <!-- مودال التعديل الشامل (بالضغط المطول) مع زر إزالة الشركة -->
-    <div id="edit-full-modal" onclick="closeEditFullModal()" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.6); z-index:5000; padding:15px; align-items:center; justify-content:center;">
-        <div class="card" style="width:100%; max-width:500px; max-height:90vh; overflow-y:auto;" onclick="event.stopPropagation()">
-            <div class="modal-header">
-                <h3 style="color:var(--navy); margin:0;">تعديل شامل للبيانات</h3>
-                <button class="delete-btn" onclick="deleteCompanyFromEdit()" title="حذف الشركة">إزالة</button>
+    <!-- Reports Modal -->
+    <div id="reports-modal" class="fixed inset-0 bg-slate-900/30 backdrop-blur-md z-[3000] hidden items-center justify-center">
+        <div class="bg-white w-full max-w-2xl rounded-[50px] p-12 shadow-2xl">
+            <div class="flex justify-between items-center mb-8">
+                <h3 class="text-3xl font-black text-slate-900">التقارير والإحصائيات</h3>
+                <button onclick="closeReports()" class="text-slate-400 hover:text-rose-500">
+                    <i data-lucide="x" size="24"></i>
+                </button>
             </div>
-            <input type="hidden" id="edit-original-name">
             
-            <label>اسم الشركة</label>
-            <input type="text" id="edit-name" class="input">
-            
-            <label>المنطقة</label>
-            <select id="edit-zone" class="input"></select>
-            
-            <label>أيام الزيارة المقررة (اختياري)</label>
-            <div class="days-checkbox-group" id="edit-plan-days-checkboxes"></div>
-
-            <label>المسؤولين</label>
-            <div id="edit-persons-container"></div>
-            <button onclick="addPersonToEdit()" type="button" style="width:100%; border:1px solid #ddd; padding:8px; border-radius:10px; margin-bottom:15px; font-size:11px;">+ إضافة مسؤول</button>
-
-            <label>ملاحظات عامة</label>
-            <textarea id="edit-general-notes" class="input" rows="2"></textarea>
-
-            <label>🧴 المنتجات والعروض المقدمة</label>
-            <div class="product-input-row">
-                <input type="text" id="edit-product-input" class="input" placeholder="اسم المنتج أو العرض" onkeydown="if(event.key==='Enter'){addProductToEdit(); event.preventDefault();}">
-                <button onclick="addProductToEdit()">إضافة</button>
-            </div>
-            <div id="edit-products-container" style="display:flex; flex-wrap:wrap; margin-bottom:12px;"></div>
-
-            <label>سجل الملاحظات (أحدث زيارة)</label>
-            <textarea id="edit-last-note" class="input" rows="3"></textarea>
-
-            <button class="btn-neon" onclick="saveFullEdit()">حفظ التغييرات</button>
-            <button onclick="closeEditFullModal()" style="width:100%; background:#666; color:white; border:none; padding:12px; border-radius:14px; margin-top:8px; font-weight:bold;">إلغاء</button>
-        </div>
-    </div>
-
-    <!-- مودال تسجيل زيارة من الخطة -->
-    <div id="visit-modal" onclick="closeVisitModal()" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.6); z-index:3500; padding:20px; align-items:center; justify-content:center;">
-        <div class="card" style="width:100%; max-width:400px;" onclick="event.stopPropagation()">
-            <h3 style="color:var(--navy); margin-top:0;">تسجيل زيارة</h3>
-            <p><b id="visit-modal-company"></b> - <span id="visit-modal-date"></span></p>
-            <textarea id="visit-modal-note" class="input" rows="3" placeholder="ملاحظات الزيارة"></textarea>
-            <button class="btn-neon" onclick="saveVisitFromPlan()">حفظ الزيارة</button>
-            <button onclick="closeVisitModal()" style="width:100%; background:#666; color:white; border:none; padding:12px; border-radius:14px; margin-top:8px; font-weight:bold;">إلغاء</button>
-        </div>
-    </div>
-
-    <!-- مودال إضافة مسؤول من خطة اليوم -->
-    <div id="add-person-modal" onclick="closeAddPersonModal()" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.6); z-index:3600; padding:20px; align-items:center; justify-content:center;">
-        <div class="card" style="width:100%; max-width:400px;" onclick="event.stopPropagation()">
-            <h3 style="color:var(--navy); margin-top:0;">➕ إضافة مسؤول للشركة</h3>
-            <p><b id="add-person-company-name"></b></p>
-            <select id="add-person-title" class="input">
-                <option>دكتور</option>
-                <option>أستاذ</option>
-                <option>أستاذة</option>
-            </select>
-            <input type="text" id="add-person-name" class="input" placeholder="اسم المسؤول">
-            <input type="tel" id="add-person-phone" class="input" placeholder="رقم الموبايل">
-            <button class="btn-neon" onclick="saveNewPerson()">حفظ المسؤول</button>
-            <button onclick="closeAddPersonModal()" style="width:100%; background:#666; color:white; border:none; padding:12px; border-radius:14px; margin-top:8px; font-weight:bold;">إلغاء</button>
-        </div>
-    </div>
-
-    <!-- مودال عرض تفاصيل الشركة -->
-    <div id="details-modal" onclick="closeModal()" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.6); z-index:3000; padding:20px; align-items:center; justify-content:center;">
-        <div class="card" style="width:100%; max-width:400px; max-height:80vh; overflow-y:auto;" onclick="event.stopPropagation()">
-            <h2 id="modal-title" style="color:var(--navy); margin-top:0;"></h2>
-            <div id="modal-content"></div>
-            <button class="btn-neon" onclick="closeModal()">إغلاق</button>
-        </div>
-    </div>
-
-    <!-- قالب PDF المحسن -->
-    <div id="pdf-template" style="display:none;">
-        <div class="pdf-container">
-            <div class="pdf-header">
-                <h1>تقرير زيارات فيزيو مصر</h1>
-                <img src="https://j.top4top.io/p_3692l51ap0.png" alt="Physio Masr Logo">
-            </div>
-            <div class="pdf-info">
-                <span><strong>الموظف:</strong> <span id="pdf-user"></span></span>
-                <span><strong>الفترة:</strong> <span id="pdf-period"></span></span>
-                <span><strong>تاريخ التقرير:</strong> <span id="pdf-date"></span></span>
-            </div>
-            <table class="pdf-table">
-                <thead>
-                    <tr>
-                        <th>الشركة</th>
-                        <th>المنطقة</th>
-                        <th>المسؤول</th>
-                        <th>الملخص</th>
-                        <th>التوقيت</th>
-                    </tr>
-                </thead>
-                <tbody id="pdf-body"></tbody>
-            </table>
-            <div class="pdf-footer">
-                تم إنشاء هذا التقرير بواسطة نظام فيزيو مصر للتسويق - جميع الحقوق محفوظة
+            <div id="reports-content" class="space-y-8">
+                <!-- Will be populated by JS -->
             </div>
         </div>
     </div>
 
-    <nav id="app-nav" style="display:none;" role="navigation" aria-label="التنقل الرئيسي">
-        <div class="nav-link active" onclick="tab('p-home', this)" role="button" tabindex="0" aria-label="الصفحة الرئيسية"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>الرئيسية</div>
-        <div class="nav-link" onclick="tab('p-add', this); getLocation();" role="button" tabindex="0" aria-label="إضافة شركة جديدة"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>إضافة شركة</div>
-        <div class="nav-link" onclick="tab('p-data', this)" role="button" tabindex="0" aria-label="عرض البيانات"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20M4 4.5A2.5 2.5 0 0 1 6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15z"/></svg>البيانات</div>
-        <div class="nav-link" onclick="tab('p-reports', this); renderReportsPage();" role="button" tabindex="0" aria-label="التقارير والإحصائيات"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>تقارير</div>
-    </nav>
+    <!-- Modals -->
+    <div id="modal" class="fixed inset-0 bg-slate-900/30 backdrop-blur-md z-[3000] hidden items-center justify-center">
+        <div class="bg-white w-full max-w-md rounded-[50px] p-12 shadow-2xl">
+            <h3 id="modal-title" class="text-3xl font-black text-slate-900 mb-8">...</h3>
+            <div id="modal-body" class="space-y-6"></div>
+            <div class="flex gap-4 mt-12">
+                <button onclick="executeAction()" class="flex-1 bg-slate-900 text-white py-5 rounded-3xl font-black text-lg">تأكيد الحفظ</button>
+                <button onclick="closeModal()" class="flex-1 bg-slate-100 text-slate-500 py-5 rounded-3xl font-black">إلغاء</button>
+            </div>
+        </div>
+    </div>
 
     <script>
-        let db = JSON.parse(localStorage.getItem('PHYSIO_V50')) || { 
-            user: "", 
-            visits: [], 
-            companies: [], 
-            zones: ["المعادي", "الدقي", "مدينة نصر", "المقطم", "حلوان", "العبور"],
-            weeklyPlan: [[], [], [], [], []] // مصفوفة من 5 أيام، كل عنصر مصفوفة بأسماء الشركات المقررة (بالترتيب)
-        };
-        let viewM = new Date(), selD = new Date().toDateString();
-        let pressTimer, currentAdminDay = Math.min(new Date().getDay(), 4); // 0-4 فقط (الأحد-الخميس)
-        let sortableInstance = null; // لتخزين كائن Sortable
-        let currentCompanyForPerson = ""; // لتخزين اسم الشركة عند إضافة مسؤول
+        // Data Storage
+        let items = JSON.parse(localStorage.getItem('studioflow_v5')) || [];
+        let users = JSON.parse(localStorage.getItem('studioflow_users')) || [
+            { id: 1, username: 'admin', password: '123456', name: 'المدير الرئيسي' }
+        ];
+        let currentUser = null;
+        let activeId = null;
+        let currentAction = null;
 
-        // متغيرات للتعامل مع اللمس في صفحة البيانات
-        let touchStartX = 0, touchStartY = 0;
-        let touchMoved = false;
-        let searchTimeout = null;
-        
-        // دالة البحث مع تأخير للأداء
-        function debounceSearch() {
-            if (searchTimeout) clearTimeout(searchTimeout);
-            searchTimeout = setTimeout(() => renderComps(), 200);
+        const gradients = [
+            'linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%)',
+            'linear-gradient(135deg, #1e293b 0%, #334155 100%)',
+            'linear-gradient(135deg, #059669 0%, #2563eb 100%)',
+            'linear-gradient(135deg, #db2777 0%, #4f46e5 100%)'
+        ];
+
+        function init() {
+            checkLogin();
         }
-        
-        // دالة إظهار الإشعارات
-        function showToast(message, type = 'success', duration = 3000) {
-            const container = document.getElementById('toast-container');
-            const toast = document.createElement('div');
-            toast.className = `toast ${type}`;
-            const icon = type === 'success' ? '✓' : type === 'error' ? '✕' : '⚠';
-            toast.innerHTML = `<span>${icon}</span><span>${message}</span>`;
-            container.appendChild(toast);
+
+        function checkLogin() {
+            const savedUser = localStorage.getItem('studioflow_current_user');
+            if(savedUser) {
+                currentUser = JSON.parse(savedUser);
+                document.getElementById('login-screen').style.display = 'none';
+                document.getElementById('current-user').innerText = currentUser.name;
+                renderWorkspace();
+                lucide.createIcons();
+            } else {
+                document.getElementById('login-screen').style.display = 'flex';
+            }
+        }
+
+        function handleLogin() {
+            const username = document.getElementById('login-username').value;
+            const password = document.getElementById('login-password').value;
+            
+            const user = users.find(u => u.username === username && u.password === password);
+            if(user) {
+                currentUser = user;
+                localStorage.setItem('studioflow_current_user', JSON.stringify(user));
+                document.getElementById('login-screen').style.display = 'none';
+                document.getElementById('current-user').innerText = user.name;
+                renderWorkspace();
+                lucide.createIcons();
+                showNotification('مرحباً ' + user.name, 'success');
+            } else {
+                showNotification('بيانات المستخدم غير صحيحة', 'error');
+            }
+        }
+
+        function handleLogout() {
+            if(confirm('هل تريد تسجيل الخروج؟')) {
+                localStorage.removeItem('studioflow_current_user');
+                currentUser = null;
+                document.getElementById('login-screen').style.display = 'flex';
+                document.getElementById('login-username').value = '';
+                document.getElementById('login-password').value = '';
+            }
+        }
+
+        function toggleSignup() {
+            const newUsername = prompt('ادخل اسم المستخدم الجديد:');
+            if(!newUsername) return;
+            const newPassword = prompt('ادخل كلمة المرور:');
+            if(!newPassword) return;
+            const newName = prompt('ادخل الاسم الكامل:');
+            if(!newName) return;
+
+            users.push({
+                id: Date.now(),
+                username: newUsername,
+                password: newPassword,
+                name: newName
+            });
+            localStorage.setItem('studioflow_users', JSON.stringify(users));
+            showNotification('تم إنشاء الحساب بنجاح', 'success');
+        }
+
+        function showNotification(message, type = 'info') {
+            const notif = document.createElement('div');
+            notif.className = 'notification';
+            const icon = type === 'success' ? 'check-circle' : type === 'error' ? 'alert-circle' : 'info';
+            notif.innerHTML = `<div class="flex items-center gap-3"><i data-lucide="${icon}" size="20"></i><span>${message}</span></div>`;
+            document.body.appendChild(notif);
+            lucide.createIcons();
             setTimeout(() => {
-                toast.style.opacity = '0';
-                toast.style.transform = 'translateY(-20px)';
-                toast.style.transition = 'all 0.3s ease';
-                setTimeout(() => toast.remove(), 300);
-            }, duration);
+                notif.classList.add('remove');
+                setTimeout(() => notif.remove(), 300);
+            }, 3000);
         }
 
-        // أسماء أيام الأسبوع بالعربية
-        const dayNames = ["الأحد", "الإثنين", "الثلاثاء", "الأربعاء", "الخميس"];
-
-        // متغير للتحكم في منع التكرار عبر الأيام (true: لا يمكن أن توجد نفس الشركة في أكثر من يوم)
-        const preventDuplicateAcrossDays = true;
-
-        window.onload = function() { 
-            try {
-                // التأكد من وجود جميع الخصائص الأساسية
-                if (!db.user) db.user = "";
-                if (!db.visits) db.visits = [];
-                if (!db.companies) db.companies = [];
-                if (!db.zones) db.zones = ["المعادي", "الدقي", "مدينة نصر", "المقطم", "حلوان", "العبور"];
-                if (!db.weeklyPlan) db.weeklyPlan = [[], [], [], [], []];
-                
-                // تنظيف البيانات من أي تكرارات سابقة
-                cleanWeeklyPlan();
-
-                // التأكد من أن كل شركة لديها جميع الحقول
-                db.companies = db.companies.map(c => {
-                    if (!c.notes) c.notes = "";
-                    if (!c.plannedDays) c.plannedDays = [];
-                    if (!c.persons) c.persons = [];
-                    if (!c.products) c.products = [];
-                    if (!c.zone) c.zone = "غير محدد";
-                    return c;
-                });
-                
-                // حفظ البيانات المصححة
-                localStorage.setItem('PHYSIO_V50', JSON.stringify(db));
-
-                if (!db.user) document.getElementById('login-screen').style.display = 'flex'; 
-                else runSplash(); 
-                
-                const personsContainer = document.getElementById('persons-container');
-                if (personsContainer && !personsContainer.children.length) addPerson(); 
-                
-                renderDayCheckboxes();
-            } catch(err) {
-                console.log("[v0] Window OnLoad Error:", err);
-                alert("خطأ في تحميل البيانات. يرجى تحديث الصفحة.");
-            }
-        };
-
-        // دالة لتنظيف التكرارات في weeklyPlan
-        function cleanWeeklyPlan() {
-            if (!db.weeklyPlan) return;
-            for (let day = 0; day < 5; day++) {
-                if (db.weeklyPlan[day]) {
-                    // إزالة التكرارات داخل نفس اليوم
-                    db.weeklyPlan[day] = [...new Set(db.weeklyPlan[day])];
-                    // إزالة أسماء شركات غير موجودة في قائمة الشركات
-                    db.weeklyPlan[day] = db.weeklyPlan[day].filter(name => 
-                        db.companies.some(c => c.name === name)
-                    );
-                } else {
-                    db.weeklyPlan[day] = [];
-                }
-            }
-
-            // إذا كان منع التكرار عبر الأيام مفعلاً، نزيل أي شركة مكررة في أكثر من يوم
-            if (preventDuplicateAcrossDays) {
-                const allCompanies = new Set();
-                for (let day = 0; day < 5; day++) {
-                    const uniqueForDay = [];
-                    for (const name of db.weeklyPlan[day]) {
-                        if (!allCompanies.has(name)) {
-                            uniqueForDay.push(name);
-                            allCompanies.add(name);
-                        }
-                    }
-                    db.weeklyPlan[day] = uniqueForDay;
-                }
-            }
-        }
-
-        // تعبئة Checkboxes أيام الأسبوع
-        function renderDayCheckboxes() {
-            let html = '';
-            for (let i = 0; i < 5; i++) {
-                html += `<label><input type="checkbox" value="${i}"> ${dayNames[i]}</label>`;
-            }
-            document.getElementById('plan-days-checkboxes').innerHTML = html;
-            document.getElementById('edit-plan-days-checkboxes').innerHTML = html;
-        }
-
-        // جلب الأيام المختارة من checkboxes
-        function getSelectedDays(containerId) {
-            let selected = [];
-            document.querySelectorAll(`#${containerId} input[type=checkbox]:checked`).forEach(cb => {
-                selected.push(parseInt(cb.value));
-            });
-            return selected;
-        }
-
-        // تحديد checkboxes بناءً على مصفوفة أيام
-        function setSelectedDays(containerId, daysArray) {
-            document.querySelectorAll(`#${containerId} input[type=checkbox]`).forEach(cb => {
-                cb.checked = daysArray.includes(parseInt(cb.value));
-            });
-        }
-
-        function firstTimeLogin() { const u = document.getElementById('user-input').value.trim(); if(u){ db.user=u; refresh(); runSplash(); } else { alert('يرجى إدخال اسمك'); } }
-        
-        // دعم لوحة المفاتيح للدخول
-        document.addEventListener('DOMContentLoaded', function() {
-            const userInput = document.getElementById('user-input');
-            if (userInput) {
-                userInput.addEventListener('keypress', function(e) {
-                    if (e.key === 'Enter') firstTimeLogin();
-                });
-            }
+        function renderWorkspace() {
+            const container = document.getElementById('workspace');
+            const empty = document.getElementById('empty-view');
+            container.innerHTML = '';
             
-            // دعم لوحة المفاتيح للتنقل
-            document.querySelectorAll('.nav-link').forEach(link => {
-                link.addEventListener('keypress', function(e) {
-                    if (e.key === 'Enter' || e.key === ' ') {
-                        e.preventDefault();
-                        this.click();
-                    }
-                });
-            });
-        });
-        function runSplash() { 
-            document.getElementById('login-screen').style.display = 'none'; 
-            const s = document.getElementById('splash-screen'); 
-            document.getElementById('splash-user-text').innerText = db.user; 
-            s.style.display = 'flex'; 
-            setTimeout(() => { s.style.opacity = '0'; s.style.transition = '0.5s'; setTimeout(() => { s.style.display = 'none'; start(); }, 500); }, 2000); 
-        }
-        function start() { document.getElementById('app-header').style.display='grid'; document.getElementById('app-content').style.display='block'; document.getElementById('app-nav').style.display='flex'; document.getElementById('user-display').innerText = db.user; refresh(); }
-
-        function refresh() { 
-            try {
-                // التأكد من وجود جميع الخصائص المطلوبة
-                if (!db.visits) db.visits = [];
-                if (!db.companies) db.companies = [];
-                if (!db.zones) db.zones = ["المعادي", "الدقي", "مدينة نصر", "المقطم", "حلوان", "العبور"];
-                if (!db.weeklyPlan) db.weeklyPlan = [[], [], [], [], []];
-                
-                // حفظ البيانات في localStorage
-                localStorage.setItem('PHYSIO_V50', JSON.stringify(db));
-                
-                // تحديث العناصر المرئية
-                renderCal(); 
-                renderVisits(); 
-                renderPlannedToday(); 
-                renderComps(); 
-                renderHubStats();
-                
-                // تحديث قوائم المناطق - مع معالجة الأخطاء
-                const zOpts = (db.zones || []).map(z=>`<option>${z}</option>`).join('') + `<option value="NEW">+ منطقة جديدة</option>`;
-                const zoneSelect = document.getElementById('comp-zone');
-                if (zoneSelect) zoneSelect.innerHTML = zOpts;
-                
-                const editZone = document.getElementById('edit-zone');
-                if (editZone) editZone.innerHTML = (db.zones || []).map(z=>`<option>${z}</option>`).join('');
-                
-                const compDl = document.getElementById('comp-dl');
-                if (compDl) compDl.innerHTML = (db.companies || []).map(c=>`<option value="${c.name}">`).join('');
-                
-                // إذا كان الهب مفتوحاً، نحدث محتوى التحكم
-                const hub = document.getElementById('employee-hub');
-                if (hub && hub.style.display === 'flex') {
-                    renderAdminTabs();
-                    renderAdminCompanyList();
-                    renderMultiSelectCompanies();
-                }
-            } catch(err) {
-                console.log("[v0] Refresh Error:", err);
-            }
-        }
-
-        // عرض خطة اليوم في الصفحة الرئيسية مع أسماء المسؤولين وزر الإضافة
-        function renderPlannedToday() {
-            const selectedDate = new Date(selD);
-            const dayOfWeek = selectedDate.getDay(); // 0 = الأحد ... 4 = الخميس
-            if (dayOfWeek > 4) {
-                document.getElementById('planned-visits').innerHTML = '<p class="card" style="text-align:center; opacity:0.7;">اليوم عطلة نهاية الأسبوع - لا توجد خطة</p>';
+            if(items.length === 0) {
+                empty.style.opacity = '1';
+                empty.style.pointerEvents = 'auto';
                 return;
             }
 
-            const plannedCompanyNames = db.weeklyPlan[dayOfWeek] || [];
-            // استثناء الشركات التي تمت زيارتها اليوم
-            const visitedToday = new Set(db.visits.filter(v => v.date === selD).map(v => v.company));
-            const companiesToShow = plannedCompanyNames.filter(name => !visitedToday.has(name));
+            empty.style.opacity = '0';
+            empty.style.pointerEvents = 'none';
 
-            if (companiesToShow.length === 0) {
-                document.getElementById('planned-visits').innerHTML = '<p class="card" style="text-align:center; opacity:0.7;">لا توجد شركات مقررة لليوم (أو تمت زيارتها)</p>';
-                return;
-            }
+            let globalTotal = 0;
 
-            let html = '';
-            companiesToShow.forEach(name => {
-                const company = db.companies.find(c => c.name === name);
-                if (!company) return;
-                // تجميع أسماء المسؤولين
-                let personsHtml = '';
-                if (company.persons && company.persons.length) {
-                    personsHtml = '<div class="persons-list">' + company.persons.map(p => 
-                        `<span class="person-badge">👤 ${p.title} ${p.name}</span>`
-                    ).join('') + '</div>';
-                }
-                html += `
-                    <div class="card planned-company-item" data-name="${company.name.replace(/'/g, "\\'")}" style="border-right:5px solid var(--teal);">
-                        <div style="display:flex; justify-content:space-between; align-items:center;">
-                            <div><b>${company.name}</b><br><small>📍 ${company.zone}</small></div>
-                            <small style="color:#888; font-size:10px;">اضغط مطولاً للتعديل</small>
-                        </div>
-                        ${personsHtml}
-                        <div style="margin-top:8px; text-align:left;">
-                            <button class="add-person-btn" onclick="event.stopPropagation(); openAddPersonModal('${company.name.replace(/'/g, "\\'")}')">➕</button>
-                        </div>
-                    </div>`;
-            });
-            document.getElementById('planned-visits').innerHTML = html;
-            
-            // إضافة مستمعات اللمس للضغط المطول على كل شركة
-            document.querySelectorAll('.planned-company-item').forEach(item => {
-                const name = item.getAttribute('data-name');
-                attachPlannedCompanyTouchEvents(item, name);
-            });
-        }
-
-        // فتح مودال إضافة مسؤول
-        function openAddPersonModal(companyName) {
-            currentCompanyForPerson = companyName;
-            document.getElementById('add-person-company-name').innerText = companyName;
-            document.getElementById('add-person-title').value = 'دكتور';
-            document.getElementById('add-person-name').value = '';
-            document.getElementById('add-person-phone').value = '';
-            document.getElementById('add-person-modal').style.display = 'flex';
-        }
-
-        function closeAddPersonModal() {
-            document.getElementById('add-person-modal').style.display = 'none';
-        }
-
-        // حفظ المسؤول الجديد
-        function saveNewPerson() {
-            const companyName = currentCompanyForPerson;
-            const title = document.getElementById('add-person-title').value;
-            const name = document.getElementById('add-person-name').value.trim();
-            const phone = document.getElementById('add-person-phone').value.trim();
-            if (!name) return alert('يرجى إدخال اسم المسؤول');
-
-            const company = db.companies.find(c => c.name === companyName);
-            if (company) {
-                if (!company.persons) company.persons = [];
-                company.persons.push({ title, name, phone });
-                localStorage.setItem('PHYSIO_V50', JSON.stringify(db));
-                refresh();
-                closeAddPersonModal();
-            }
-        }
-
-        // فتح مودال تسجيل الزيارة
-        function openVisitModal(companyName) {
-            document.getElementById('visit-modal-company').innerText = companyName;
-            document.getElementById('visit-modal-date').innerText = selD;
-            document.getElementById('visit-modal-note').value = '';
-            document.getElementById('visit-modal').style.display = 'flex';
-        }
-
-        function closeVisitModal() {
-            document.getElementById('visit-modal').style.display = 'none';
-        }
-
-        // حفظ الزيارة من المودال
-        function saveVisitFromPlan() {
-            try {
-                const company = document.getElementById('visit-modal-company').innerText;
-                const note = document.getElementById('visit-modal-note').value.trim();
-                if (!note) return alert('يرجى كتابة ملاحظة للزيارة');
+            items.forEach((item, index) => {
+                globalTotal += item.bookings.reduce((s, b) => s + b.amount, 0);
+                const node = document.createElement('div');
+                node.className = 'node-item opacity-0';
                 
-                if (!company) return alert('خطأ: لم يتم تحديد الشركة');
-                if (!selD) return alert('خطأ: لم يتم تحديد التاريخ');
+                let link = index > 0 ? `<div class="link-path"><div class="path-line"></div></div>` : '';
 
-                const newVisit = {
-                    company,
-                    note,
-                    date: selD,
-                    timestamp: new Date().toLocaleTimeString('ar-EG'),
-                    id: Date.now() // إضافة معرف فريد
-                };
-                
-                if (!db.visits) db.visits = [];
-                db.visits.push(newVisit);
-                localStorage.setItem('PHYSIO_V50', JSON.stringify(db));
-                refresh();
-                closeVisitModal();
-                showToast('تم حفظ الزيارة بنجاح', 'success');
-            } catch(err) {
-                console.log("[v0] Save Visit Error:", err);
-                alert('حدث خطأ أثناء حفظ الزيارة');
-            }
-        }
-
-        // حفظ شركة جديدة
-        function saveNewCompany() {
-            try {
-                const name = document.getElementById('comp-name').value.trim();
-                const zone = document.getElementById('comp-zone').value;
-                if(!name) return alert("يرجى كتابة اسم الشركة");
-                
-                if (!zone) return alert("يرجى اختيار المنطقة");
-                
-                if (db.companies.some(c => c.name === name)) {
-                    return alert("هذه الشركة موجودة بالفعل! استخدم البحث أو الضغط المطول لتعديلها.");
-                }
-
-                let pList = []; 
-                document.querySelectorAll('#persons-container > div').forEach(d => { 
-                    const n = d.querySelector('.p-name').value.trim(); 
-                    if(n) pList.push({ 
-                        title: d.querySelector('.p-title').value, 
-                        name: n, 
-                        phone: d.querySelector('.p-phone').value 
-                    }); 
-                });
-
-                const plannedDays = getSelectedDays('plan-days-checkboxes');
-                const generalNotes = document.getElementById('comp-general-notes').value.trim();
-
-                if (!db.companies) db.companies = [];
-
-                db.companies.push({ 
-                    name, 
-                    zone, 
-                    persons: pList, 
-                    location: document.getElementById('v-location').value,
-                    plannedDays: plannedDays,
-                    notes: generalNotes,
-                    products: [],
-                    createdAt: new Date().toISOString()
-                });
-                
-                // حفظ البيانات فوراً
-                localStorage.setItem('PHYSIO_V50', JSON.stringify(db));
-                
-                // مسح الحقول
-                document.getElementById('comp-name').value=''; 
-                document.getElementById('persons-container').innerHTML = ''; 
-                addPerson();
-                document.getElementById('v-location').value = '';
-                document.getElementById('gps-status').innerText = '';
-                document.getElementById('comp-general-notes').value = '';
-                document.querySelectorAll('#plan-days-checkboxes input[type=checkbox]').forEach(cb => cb.checked = false);
-
-                refresh(); 
-                showToast('تم إضافة الشركة بنجاح', 'success');
-                tab('p-home', document.querySelectorAll('.nav-link')[0]);
-            } catch(err) {
-                console.log("[v0] Save Company Error:", err);
-                alert('حدث خطأ أثناء إضافة الشركة');
-            }
-        }
-
-        // عرض الشركات في صفحة البيانات (م�� تحسين اللمس)
-        function renderComps() { 
-            const s = document.getElementById('comp-search').value.toLowerCase(); 
-            const f = db.companies.filter(c => c.name.toLowerCase().includes(s) || c.zone.toLowerCase().includes(s)); 
-            let html = '';
-            f.forEach(c => {
-                const daysStr = (c.plannedDays || []).map(d => dayNames[d]).join('، ');
-                html += `
-                <div class="card company-item" 
-                     data-name="${c.name.replace(/'/g, "\\'")}"
-                     style="display:flex; justify-content:space-between; align-items:center;">
-                    <div>
-                        <b>${c.name}</b><br>
-                        <small>📍 ${c.zone}</small><br>
-                        ${daysStr ? '<small class="planned-day-badge">🗓️ ' + daysStr + '</small>' : ''}
-                        ${c.notes ? '<br><small>📝 ' + c.notes + '</small>' : ''}
-                        ${c.persons && c.persons.length ? '<br><small>👤 ' + c.persons.map(p => p.name).join(' - ') + '</small>' : ''}
-                    </div>
-                    <svg style="width:14px; color:var(--teal);" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M15 18l-6-6 6-6" /></svg>
-                </div>`;
-            });
-            document.getElementById('company-list').innerHTML = html;
-
-            // إضافة مستمعات اللمس لكل عنصر
-            document.querySelectorAll('.company-item').forEach(item => {
-                const name = item.getAttribute('data-name');
-                attachTouchEvents(item, name);
-            });
-        }
-
-        // دوال اللمس للتمييز بين النقر والتمرير
-        function attachTouchEvents(element, companyName) {
-            let touchStartTime;
-            let touchStartX, touchStartY;
-            let mouseStartX = 0, mouseStartY = 0;
-            let longPressTriggered = false;
-
-            element.addEventListener('touchstart', (e) => {
-                touchStartTime = Date.now();
-                touchStartX = e.touches[0].clientX;
-                touchStartY = e.touches[0].clientY;
-                touchMoved = false;
-                longPressTriggered = false;
-
-                // بدء مؤقت الضغط المطول
-                pressTimer = setTimeout(() => {
-                    longPressTriggered = true;
-                    openFullEdit(companyName);
-                }, 800);
-            }, { passive: true });
-
-            element.addEventListener('touchmove', (e) => {
-                if (!touchStartX || !touchStartY) return;
-                const dx = Math.abs(e.touches[0].clientX - touchStartX);
-                const dy = Math.abs(e.touches[0].clientY - touchStartY);
-                if (dx > 10 || dy > 10) {
-                    touchMoved = true;
-                    if (pressTimer) {
-                        clearTimeout(pressTimer);
-                        pressTimer = null;
-                    }
-                }
-            }, { passive: true });
-
-            element.addEventListener('touchend', (e) => {
-                if (pressTimer) {
-                    clearTimeout(pressTimer);
-                    pressTimer = null;
-                }
-                const touchEndTime = Date.now();
-                const touchDuration = touchEndTime - touchStartTime;
-
-                // إذا لم تكن هناك حركة والمدة أقل من 300 مللي (نقرة قصيرة) ولم يتم تفعيل الضغط المطول
-                if (!touchMoved && touchDuration < 300 && !longPressTriggered) {
-                    showCompDetails(companyName);
-                }
-            });
-
-            // للفأرة (اختبار على الكمبيوتر)
-            element.addEventListener('mousedown', (e) => {
-                touchStartTime = Date.now();
-                mouseStartX = e.clientX;
-                mouseStartY = e.clientY;
-                touchMoved = false;
-                longPressTriggered = false;
-                pressTimer = setTimeout(() => {
-                    longPressTriggered = true;
-                    openFullEdit(companyName);
-                }, 800);
-            });
-
-            element.addEventListener('mousemove', (e) => {
-                const dx = Math.abs(e.clientX - mouseStartX);
-                const dy = Math.abs(e.clientY - mouseStartY);
-                if ((dx > 10 || dy > 10) && pressTimer) {
-                    clearTimeout(pressTimer);
-                    pressTimer = null;
-                    touchMoved = true;
-                }
-            });
-
-            element.addEventListener('mouseup', (e) => {
-                if (pressTimer) {
-                    clearTimeout(pressTimer);
-                    pressTimer = null;
-                }
-                const mouseUpTime = Date.now();
-                const duration = mouseUpTime - touchStartTime;
-                if (!touchMoved && duration < 300 && !longPressTriggered) {
-                    showCompDetails(companyName);
-                }
-            });
-        }
-
-        // الضغط المطول (تم تضمينه أعلاه، ولكن نحتاج الدوال القديمة أيضاً)
-        function startLongPress(name) { /* لن نستخدمها بعد الآن */ }
-        function endLongPress(name) { /* لن نستخدمها بعد الآن */ }
-        
-        // دوال اللمس للشركات في صفحة الخطة اليومية (الرئيسية)
-        function attachPlannedCompanyTouchEvents(element, companyName) {
-            let touchStartTime;
-            let touchStartX, touchStartY;
-            let mouseStartX = 0, mouseStartY = 0;
-            let longPressTriggered = false;
-            let localPressTimer = null;
-
-            element.addEventListener('touchstart', (e) => {
-                touchStartTime = Date.now();
-                touchStartX = e.touches[0].clientX;
-                touchStartY = e.touches[0].clientY;
-                touchMoved = false;
-                longPressTriggered = false;
-
-                localPressTimer = setTimeout(() => {
-                    longPressTriggered = true;
-                    // اهتزاز خفيف للإشعار (إذا كان مدعوماً)
-                    if (navigator.vibrate) navigator.vibrate(50);
-                    openFullEdit(companyName);
-                }, 600);
-            }, { passive: true });
-
-            element.addEventListener('touchmove', (e) => {
-                if (!touchStartX || !touchStartY) return;
-                const dx = Math.abs(e.touches[0].clientX - touchStartX);
-                const dy = Math.abs(e.touches[0].clientY - touchStartY);
-                if (dx > 10 || dy > 10) {
-                    touchMoved = true;
-                    if (localPressTimer) {
-                        clearTimeout(localPressTimer);
-                        localPressTimer = null;
-                    }
-                }
-            }, { passive: true });
-
-            element.addEventListener('touchend', (e) => {
-                if (localPressTimer) {
-                    clearTimeout(localPressTimer);
-                    localPressTimer = null;
-                }
-                const touchEndTime = Date.now();
-                const touchDuration = touchEndTime - touchStartTime;
-
-                // نقرة قصيرة = فتح مودال الزيارة
-                if (!touchMoved && touchDuration < 300 && !longPressTriggered) {
-                    openVisitModal(companyName);
-                }
-            });
-
-            // دعم الماوس (للاختبار على الكمبيوتر)
-            element.addEventListener('mousedown', (e) => {
-                if (e.target.tagName === 'BUTTON') return; // تجاهل الضغط على الأزرار
-                touchStartTime = Date.now();
-                mouseStartX = e.clientX;
-                mouseStartY = e.clientY;
-                touchMoved = false;
-                longPressTriggered = false;
-                localPressTimer = setTimeout(() => {
-                    longPressTriggered = true;
-                    openFullEdit(companyName);
-                }, 600);
-            });
-
-            element.addEventListener('mousemove', (e) => {
-                const dx = Math.abs(e.clientX - mouseStartX);
-                const dy = Math.abs(e.clientY - mouseStartY);
-                if ((dx > 10 || dy > 10) && localPressTimer) {
-                    clearTimeout(localPressTimer);
-                    localPressTimer = null;
-                    touchMoved = true;
-                }
-            });
-
-            element.addEventListener('mouseup', (e) => {
-                if (localPressTimer) {
-                    clearTimeout(localPressTimer);
-                    localPressTimer = null;
-                }
-                const mouseUpTime = Date.now();
-                const duration = mouseUpTime - touchStartTime;
-                if (!touchMoved && duration < 300 && !longPressTriggered && e.target.tagName !== 'BUTTON') {
-                    openVisitModal(companyName);
-                }
-            });
-
-            element.addEventListener('mouseleave', () => {
-                if (localPressTimer) {
-                    clearTimeout(localPressTimer);
-                    localPressTimer = null;
-                }
-            });
-        }
-
-        // فتح التعديل الشامل (ضغط مطول)
-        function openFullEdit(name) {
-            const c = db.companies.find(co => co.name === name);
-            if(!c) return;
-            document.getElementById('edit-original-name').value = c.name;
-            document.getElementById('edit-name').value = c.name;
-            document.getElementById('edit-zone').value = c.zone;
-            setSelectedDays('edit-plan-days-checkboxes', c.plannedDays || []);
-
-            const cont = document.getElementById('edit-persons-container');
-            cont.innerHTML = '';
-            (c.persons || []).forEach(p => addPersonToEdit(p));
-
-            document.getElementById('edit-general-notes').value = c.notes || '';
-            
-            // تحميل المنتجات
-            if (!c.products) c.products = [];
-            renderEditProducts(c.products);
-            document.getElementById('edit-product-input').value = '';
-            
-            const vs = db.visits.filter(v => v.company === name);
-            document.getElementById('edit-last-note').value = vs.length ? vs[vs.length-1].note : "";
-            
-            document.getElementById('edit-full-modal').style.display = 'flex';
-        }
-
-        // دالة إضافة مسؤول في نافذة التعديل (مع زر إزالة)
-        function addPersonToEdit(data = null) {
-            const container = document.getElementById('edit-persons-container');
-            const div = document.createElement('div');
-            div.className = 'person-edit-row';
-            div.innerHTML = `
-                <select class="input ep-title" style="width:85px;">
-                    <option ${data?.title==='دكتور'?'selected':''}>دكتور</option>
-                    <option ${data?.title==='أستاذ'?'selected':''}>أستاذ</option>
-                    <option ${data?.title==='أستاذة'?'selected':''}>أستاذة</option>
-                </select>
-                <input type="text" class="input ep-name" placeholder="الاسم" value="${data?.name||''}">
-                <input type="tel" class="input ep-phone" placeholder="الموبايل" value="${data?.phone||''}">
-                <button class="delete-btn small" onclick="removePersonFromEdit(this)" title="حذف المسؤول">إزالة</button>
-            `;
-            container.appendChild(div);
-        }
-
-        // دالة حذف مسؤول من نافذة التعد��ل
-        function removePersonFromEdit(btn) {
-            if (confirm('هل أنت متأكد من حذف هذا المسؤول؟')) {
-                const row = btn.closest('.person-edit-row');
-                if (row) row.remove();
-            }
-        }
-
-        // دالة حذف الشركة بالكامل
-        function deleteCompanyFromEdit() {
-            try {
-                const companyName = document.getElementById('edit-original-name').value;
-                if (!companyName) return alert('خطأ: لم يتم تحديد الشركة');
-                
-                if (confirm(`هل أنت متأكد من حذف شركة "${companyName}" نهائياً؟ سيتم حذف جميع الزيارات المرتبطة بها أيضاً.`)) {
-                    // حذف الشركة من قائمة الشركات
-                    db.companies = (db.companies || []).filter(c => c.name !== companyName);
-                    
-                    // حذف جميع الزيارات المرتبطة بهذه الشركة
-                    db.visits = (db.visits || []).filter(v => v.company !== companyName);
-                    
-                    // حذف الشركة من خطة الأسبوع (جميع الأيام)
-                    for (let day = 0; day < 5; day++) {
-                        if (db.weeklyPlan[day]) {
-                            db.weeklyPlan[day] = db.weeklyPlan[day].filter(name => name !== companyName);
-                        }
-                    }
-                    
-                    localStorage.setItem('PHYSIO_V50', JSON.stringify(db));
-                    closeEditFullModal();
-                    refresh();
-                    showToast(`تم حذف الشركة "${companyName}" بنجاح`, 'success');
-                }
-            } catch(err) {
-                console.log("[v0] Delete Company Error:", err);
-                alert('حدث خطأ أثناء حذف الشركة');
-            }
-        }
-
-        function saveFullEdit() {
-            try {
-                const oldN = document.getElementById('edit-original-name').value;
-                const newN = document.getElementById('edit-name').value.trim();
-                const newZ = document.getElementById('edit-zone').value;
-                const newPlannedDays = getSelectedDays('edit-plan-days-checkboxes');
-                const newNotes = document.getElementById('edit-general-notes').value.trim();
-                
-                if(!newN) return alert("الاسم مطلوب");
-                if(!newZ) return alert("المنطقة مطلوبة");
-                
-                let pList = [];
-                document.querySelectorAll('#edit-persons-container .person-edit-row').forEach(row => {
-                    const title = row.querySelector('.ep-title').value;
-                    const name = row.querySelector('.ep-name').value.trim();
-                    const phone = row.querySelector('.ep-phone').value.trim();
-                    if (name) pList.push({ title, name, phone });
-                });
-
-                const cIdx = db.companies.findIndex(c => c.name === oldN);
-                if(cIdx !== -1) {
-                    db.companies[cIdx].name = newN;
-                    db.companies[cIdx].zone = newZ;
-                    db.companies[cIdx].persons = pList;
-                    db.companies[cIdx].plannedDays = newPlannedDays;
-                    db.companies[cIdx].notes = newNotes;
-                    // products تُحفظ مباشرة على الكائن لحظة الإضافة/الحذف، نحافظ عليها هنا
-                    if (!db.companies[cIdx].products) db.companies[cIdx].products = [];
-                    
-                    db.visits.forEach(v => {
-                        if(v.company === oldN) {
-                            v.company = newN;
-                            if(v === db.visits.filter(x => x.company === newN).pop()) v.note = document.getElementById('edit-last-note').value;
-                        }
-                    });
-                    
-                    // تحديث أسماء الشركات في weeklyPlan إذا تغير الاسم
-                    for (let day=0; day<5; day++) {
-                        db.weeklyPlan[day] = db.weeklyPlan[day].map(n => n === oldN ? newN : n);
-                    }
-                    
-                    // حفظ البيانات فوراً
-                    localStorage.setItem('PHYSIO_V50', JSON.stringify(db));
-                    
-                    refresh();
-                    closeEditFullModal();
-                    showToast('تم تحديث الشركة بنجاح', 'success');
-                } else {
-                    alert('خطأ: لم يتم العثور على الشركة');
-                }
-            } catch(err) {
-                console.log("[v0] Save Full Edit Error:", err);
-                alert('حدث خطأ أثناء حفظ التغييرات');
-            }
-        }
-
-        function closeEditFullModal() { document.getElementById('edit-full-modal').style.display = 'none'; }
-
-        // التقويم
-        function renderCal() { 
-            const grid = document.getElementById('calendar'); grid.innerHTML = ''; 
-            const y = viewM.getFullYear(), m = viewM.getMonth(); 
-            document.getElementById('month-label').innerText = viewM.toLocaleDateString('ar-EG', {month:'long', year:'numeric'}); 
-            const first = new Date(y, m, 1).getDay(); const days = new Date(y, m+1, 0).getDate(); 
-            for(let i=0; i<first; i++) grid.innerHTML += '<div></div>'; 
-            for(let d=1; d<=days; d++) { 
-                let dStr = new Date(y, m, d).toDateString(); 
-                grid.innerHTML += `<div class="day ${dStr === selD ? 'selected' : ''} ${db.visits.some(v=>v.date===dStr)?'has-v':''}" onclick="selD='${dStr}'; refresh();">${d}</div>`; 
-            } 
-        }
-
-        function renderVisits() { 
-            const container = document.getElementById('daily-visits');
-            if (!container) return;
-            
-            const f = db.visits.filter(v => v.date === selD);
-            if (f.length === 0) {
-                container.innerHTML = '<p style="text-align:center; opacity:0.5;">لا زيارات اليوم</p>';
-                return;
-            }
-            
-            container.innerHTML = f.map(v => 
-                `<div class="card" style="border-right:5px solid var(--teal)"><b>${v.company}</b><br><small>${v.note}</small></div>`
-            ).join('');
-        }
-        
-        function showCompDetails(name) { 
-            try {
-                const c = db.companies.find(co => co.name === name); 
-                if (!c) {
-                    alert('خطأ: لم يتم العثور على الشركة');
-                    return;
-                }
-                
-                const vs = db.visits.filter(v => v.company === name); 
-                document.getElementById('modal-title').innerText = c.name; 
-                let h = `<p><b>المنطقة:</b> ${c.zone || 'غير محدد'}</p>`; 
-                if (c.plannedDays && c.plannedDays.length) {
-                    h += `<p><b>أيام الزيارة:</b> ${c.plannedDays.map(d => dayNames[d] || 'غير معروف').join(' - ')}</p>`;
-                }
-                if (c.notes) h += `<p><b>ملاحظات عامة:</b> ${c.notes}</p>`;
-                if(c.location) h += `<p><b>العنوان:</b> <a href="${c.location}" target="_blank" style="color:var(--teal);">فتح الخريطة 📍</a></p>`; 
-                if (c.products && c.products.length) {
-                    h += `<hr><h4>🧴 المنتجات والعروض:</h4><div style="display:flex;flex-wrap:wrap;gap:5px;margin-bottom:8px;">${c.products.map(p=>`<span class="product-tag" style="cursor:default;">${p}</span>`).join('')}</div>`;
-                }
-                h += `<hr><h4>المسؤولين:</h4>`; 
-                (c.persons||[]).forEach(p => h += `<p>• ${p.title}/ ${p.name} (${p.phone || 'لا يوجد'})</p>`); 
-                h += `<hr><h4>سجل الزيارات:</h4>`;
-                if (vs.length === 0) {
-                    h += '<p style="text-align:center; opacity:0.5;">لا توجد زيارات مسجلة</p>';
-                } else {
-                    vs.forEach(v => h += `<p style="font-size:12px; border-bottom:1px solid #eee; padding:5px 0;">📅 ${v.date}: ${v.note}</p>`);
-                }
-                
-                document.getElementById('modal-content').innerHTML = h; 
-                document.getElementById('details-modal').style.display = 'flex'; 
-            } catch(err) {
-                console.log("[v0] Show Company Details Error:", err);
-                alert('حدث خطأ أثناء عرض بيانات الشركة');
-            }
-        }
-        
-        function addPerson() { 
-            const div = document.createElement('div'); div.style.display = "flex"; div.style.gap = "5px"; div.style.marginBottom = "8px"; 
-            div.innerHTML = `<select class="input p-title" style="width:90px;"><option>دكتور</option><option>أستاذ</option><option>أستاذة</option></select><input type="text" class="input p-name" placeholder="الاسم" style="flex:1;"><input type="tel" class="input p-phone" placeholder="الموبايل" style="flex:1;">`; 
-            document.getElementById('persons-container').appendChild(div); 
-        }
-
-        function getLocation() { const s = document.getElementById('gps-status'); if (navigator.geolocation) { navigator.geolocation.getCurrentPosition((pos) => { document.getElementById('v-location').value = `https://www.google.com/maps?q=${pos.coords.latitude},${pos.coords.longitude}`; s.innerText = "تم تحديد الموقع بنجاح ✅"; }, () => { s.innerText = "تعذر جلب الموقع."; }); } }
-
-        // إحصائيات
-        function renderHubStats() {
-            const mVisits = db.visits.filter(v => {
-                const d = new Date(v.date);
-                return d.getMonth() === viewM.getMonth() && d.getFullYear() === viewM.getFullYear();
-            });
-            document.getElementById('st-visits').innerText = mVisits.length;
-            document.getElementById('st-comps').innerText = new Set(mVisits.map(v => v.company)).size;
-            let pct = Math.min(Math.round((mVisits.length / 60) * 100), 100);
-            document.getElementById('target-bar').style.width = pct + '%';
-            document.getElementById('target-pct').innerText = pct + '%';
-            let zCounts = {};
-            mVisits.forEach(v => {
-                const c = db.companies.find(co => co.name === v.company);
-                if(c) zCounts[c.zone] = (zCounts[c.zone] || 0) + 1;
-            });
-            let sorted = Object.entries(zCounts).sort((a,b) => b[1]-a[1]).slice(0,3);
-            document.getElementById('top-zones').innerHTML = sorted.map(z => `<div class="tag-item">${z[0]} (${z[1]})</div>`).join('') || '<small>لا بيانات كافية</small>';
-        }
-
-        // دوال PDF والتصدير (محسنة بشكل كبير)
-        function downloadMonthlyPDF() {
-            const mVisits = db.visits.filter(v => {
-                const d = new Date(v.date);
-                return d.getMonth() === viewM.getMonth() && d.getFullYear() === viewM.getFullYear();
-            });
-            if(!mVisits.length) return alert("لا توجد زيارات لهذا الشهر");
-            generatePDF(mVisits, `تقرير_شهر_${viewM.getMonth()+1}`);
-        }
-
-        function downloadPDF() {
-            const vT = db.visits.filter(v => v.date === selD);
-            if(!vT.length) return alert("لا يوجد بيانات اليوم");
-            generatePDF(vT, `تقرير_يوم_${selD}`);
-        }
-
-        function generatePDF(data, fileName) {
-            try {
-                // تعبئة البيانات في القالب
-                document.getElementById('pdf-user').innerText = db.user;
-                document.getElementById('pdf-period').innerText = fileName.replace(/_/g, ' ');
-                document.getElementById('pdf-date').innerText = new Date().toLocaleDateString('ar-EG');
-
-                let rows = "";
-                data.forEach(v => {
-                    const c = db.companies.find(co => co.name === v.company) || {};
-                    const p = c.persons && c.persons[0] ? c.persons[0].name : '-';
-                    rows += `<tr>
-                        <td>${v.company}</td>
-                        <td>${c.zone || '-'}</td>
-                        <td>${p}</td>
-                        <td>${v.note}</td>
-                        <td>${v.timestamp || ''}</td>
-                    </tr>`;
-                });
-                document.getElementById('pdf-body').innerHTML = rows;
-
-                const el = document.getElementById('pdf-template');
-                if (!el) {
-                    alert("خطأ: قالب PDF غير موجود");
-                    return;
-                }
-                
-                el.style.display = 'block';
-                
-                // إعدادات محسنة لـ html2pdf - أهم نقطة لتحسين الجودة
-                const opt = {
-                    margin: [15, 15, 15, 15], // زيادة الهوامش
-                    filename: `${fileName}.pdf`,
-                    image: { type: 'jpeg', quality: 1 },
-                    html2canvas: { 
-                        scale: 2.5,          // دقة عالي��
-                        useCORS: true, 
-                        letterRendering: true,
-                        logging: false,
-                        dpi: 300
-                    },
-                    jsPDF: { 
-                        unit: 'mm', 
-                        format: 'a4', 
-                        orientation: 'portrait',
-                        compress: true
-                    }
-                };
-
-                // إضافة معالجة صحيحة للأخطاء
-                if (typeof html2pdf === 'function') {
-                    html2pdf().from(el).set(opt).save()
-                        .catch(err => {
-                            console.log("[v0] PDF Error:", err);
-                            alert("حدث خطأ أثناء إنشاء ملف PDF. يرجى المحاولة مجدداً.");
-                        })
-                        .finally(() => {
-                            el.style.display = 'none';
-                        });
-                } else {
-                    alert("مكتبة PDF غير محملة بعد. يرجى الانتظار والمحاولة مجدداً.");
-                    el.style.display = 'none';
-                }
-            } catch(err) {
-                console.log("[v0] PDF Generation Error:", err);
-                alert("حدث خطأ أثناء إنشاء التقرير PDF");
-            }
-        }
-
-        function shareWA() {
-            const f = db.visits.filter(v => v.date === selD);
-            if(!f.length) return alert("لا توجد زيارات");
-            let fullMsg = "*تقرير زيارات اليوم*%0A";
-            f.forEach(v => {
-                const c = db.companies.find(co => co.name === v.company) || {};
-                fullMsg += `%0A📍 ${c.zone} | 🏢 ${v.company}%0A📝 ${v.note}%0A⏰ ${v.timestamp}%0A---%0A`;
-            });
-            window.open(`https://wa.me/?text=${fullMsg}`);
-        }
-
-        // دوال الهب
-        function toggleHub(show) { 
-            document.getElementById('employee-hub').style.display = show ? 'flex' : 'none'; 
-            if (show) {
-                // تحديث محتوى التحكم عند الفتح
-                renderAdminTabs();
-                renderAdminCompanyList();
-                renderMultiSelectCompanies();
-            }
-        }
-
-        function switchHubTab(tab) {
-            document.querySelectorAll('.hub-tab').forEach(t => t.classList.remove('active'));
-            document.querySelectorAll('.hub-tab-content').forEach(c => c.classList.remove('active'));
-            if (tab === 'stats') {
-                document.querySelector('.hub-tab').classList.add('active');
-                document.getElementById('hub-stats').classList.add('active');
-            } else {
-                document.querySelectorAll('.hub-tab')[1].classList.add('active');
-                document.getElementById('hub-control').classList.add('active');
-                // تحديث محتوى التحكم عند التبديل إليه
-                renderAdminTabs();
-                renderAdminCompanyList();
-                renderMultiSelectCompanies();
-            }
-        }
-
-        // دوال التحكم (مع الاختيار المتعدد ومنع التكرار)
-        function renderAdminTabs() {
-            const tabsContainer = document.getElementById('admin-days-tabs');
-            if (!tabsContainer) return;
-            let html = '';
-            for (let i = 0; i < 5; i++) {
-                html += `<div class="admin-day-tab ${i === currentAdminDay ? 'active' : ''}" onclick="setAdminDay(${i})">${dayNames[i]}</div>`;
-            }
-            tabsContainer.innerHTML = html;
-        }
-
-        function setAdminDay(dayIndex) {
-            currentAdminDay = dayIndex;
-            renderAdminCompanyList();
-            renderMultiSelectCompanies();
-            // تحديث التبويبات النشطة
-            document.querySelectorAll('#admin-days-tabs .admin-day-tab').forEach((tab, idx) => {
-                if (idx === dayIndex) tab.classList.add('active');
-                else tab.classList.remove('active');
-            });
-        }
-
-        function renderAdminCompanyList() {
-            try {
-                const listContainer = document.getElementById('admin-company-list');
-                if (!listContainer) return;
-                const companiesForDay = db.weeklyPlan[currentAdminDay] || [];
-                
-                if (companiesForDay.length === 0) {
-                    listContainer.innerHTML = '<p class="card" style="text-align:center;">لا توجد شركات في هذا اليوم</p>';
-                    return;
-                }
-
-                let html = '';
-                companiesForDay.forEach((companyName) => {
-                    const company = db.companies.find(c => c.name === companyName);
-                    if (!company) return;
-                    html += `
-                        <div class="plan-company-row" data-company="${company.name.replace(/'/g, "\\'")}">
-                            <span class="drag-handle">☰</span>
-                            <div class="plan-company-info" onclick="showCompDetails('${company.name.replace(/'/g, "\\'")}')">
-                                <b>${company.name}</b><br>
-                                <small>📍 ${company.zone}</small>
+                node.innerHTML = `
+                    ${link}
+                    <div class="relative group">
+                        <div class="circle-container" onclick="openPanel(${item.id})">
+                            <div class="inner-fill" style="background: ${item.color}">
+                                <i data-lucide="home" size="44"></i>
                             </div>
-                            <button class="delete-btn small" onclick="removeCompanyFromDay('${company.name.replace(/'/g, "\\'")}')" title="حذف من الخطة">إزالة</button>
-                        </div>`;
-                });
-                listContainer.innerHTML = html;
-
-                // تفعيل السحب (drag and drop) باستخدام SortableJS
-                if (sortableInstance) {
-                    sortableInstance.destroy();
-                    sortableInstance = null;
-                }
-                
-                if (typeof Sortable !== 'undefined') {
-                    sortableInstance = new Sortable(listContainer, {
-                        animation: 150,
-                        handle: '.drag-handle',
-                        onEnd: function(evt) {
-                            try {
-                                // إعادة بناء المصفوفة حسب الترتيب الجديد
-                                const newOrder = [];
-                                const items = listContainer.querySelectorAll('.plan-company-row');
-                                items.forEach(item => {
-                                    const companyName = item.getAttribute('data-company');
-                                    if (companyName) newOrder.push(companyName);
-                                });
-                                db.weeklyPlan[currentAdminDay] = newOrder;
-                                localStorage.setItem('PHYSIO_V50', JSON.stringify(db));
-                                refresh(); // تحديث الصفحة الرئيسية
-                            } catch(err) {
-                                console.log("[v0] Sortable onEnd Error:", err);
-                            }
-                        }
-                    });
-                }
-            } catch(err) {
-                console.log("[v0] Admin Company List Error:", err);
-            }
-        }
-
-        // عرض قائمة الشركات المتاحة للاختيار المتعدد (مع مراعاة منع التكرار)
-        function renderMultiSelectCompanies() {
-            const container = document.getElementById('multi-select-companies');
-            if (!container) return;
-            
-            // الشركات الموجودة في اليوم الحالي
-            const existingInCurrentDay = new Set(db.weeklyPlan[currentAdminDay] || []);
-            
-            let available;
-            if (preventDuplicateAcrossDays) {
-                // جميع الشركات غير الموجودة في أي يوم
-                const allUsed = new Set();
-                for (let day = 0; day < 5; day++) {
-                    (db.weeklyPlan[day] || []).forEach(name => allUsed.add(name));
-                }
-                available = db.companies.filter(c => !allUsed.has(c.name));
-            } else {
-                // فقط الشركات غير الموجودة في اليوم الحالي
-                available = db.companies.filter(c => !existingInCurrentDay.has(c.name));
-            }
-            
-            if (available.length === 0) {
-                container.innerHTML = '<p style="text-align:center;">جميع الشركات مضافة بالفعل</p>';
-                return;
-            }
-
-            let html = '';
-            available.forEach(company => {
-                html += `
-                    <div class="multi-select-item">
-                        <input type="checkbox" value="${company.name.replace(/'/g, "&apos;")}" id="chk_${company.name.replace(/[^a-zA-Z0-9]/g, '_')}">
-                        <label for="chk_${company.name.replace(/[^a-zA-Z0-9]/g, '_')}">${company.name} (${company.zone})</label>
-                    </div>`;
-            });
-            container.innerHTML = html;
-        }
-
-        // إضافة الشركات المحددة لليوم مع منع التكرار
-        function addSelectedCompanies() {
-            const checkboxes = document.querySelectorAll('#multi-select-companies input[type=checkbox]:checked');
-            if (checkboxes.length === 0) {
-                alert('لم تختار أي شركة');
-                return;
-            }
-
-            const selected = [];
-            checkboxes.forEach(cb => {
-                selected.push(cb.value);
+                            <button onclick="event.stopPropagation(); deleteUnit(${item.id})" class="absolute -top-3 -right-3 w-12 h-12 bg-white rounded-full flex items-center justify-center text-slate-200 hover:text-rose-500 opacity-0 group-hover:opacity-100 transition-all shadow-xl border border-slate-50">
+                                <i data-lucide="trash-2" size="18"></i>
+                            </button>
+                        </div>
+                        <div class="absolute top-[210px] left-1/2 -translate-x-1/2 text-center w-48">
+                            <h4 class="font-black text-slate-800 text-lg mb-1 truncate">${item.name}</h4>
+                            <span class="text-[9px] font-black text-indigo-500 bg-indigo-50 px-3 py-1 rounded-full uppercase tracking-widest">${item.bookings.length} حجوزات</span>
+                        </div>
+                    </div>
+                `;
+                container.appendChild(node);
             });
 
-            // فلترة الشركات المختارة: نأخذ فقط التي لا توجد بالفعل في اليوم الحالي
-            const existingInCurrentDay = new Set(db.weeklyPlan[currentAdminDay] || []);
-            let newCompanies = selected.filter(name => !existingInCurrentDay.has(name));
-
-            if (preventDuplicateAcrossDays) {
-                // نتأكد أيضاً من عدم وجودها في أي يوم آخر
-                const allUsed = new Set();
-                for (let day = 0; day < 5; day++) {
-                    if (day !== currentAdminDay) {
-                        (db.weeklyPlan[day] || []).forEach(name => allUsed.add(name));
-                    }
-                }
-                const duplicatesAcrossDays = newCompanies.filter(name => allUsed.has(name));
-                if (duplicatesAcrossDays.length > 0) {
-                    alert(`الشركات التالية موجودة في أيام أخرى ولا يمكن إضافتها: ${duplicatesAcrossDays.join('، ')}`);
-                    // نزيلها من القائمة
-                    newCompanies = newCompanies.filter(name => !allUsed.has(name));
-                }
-            }
-
-            if (newCompanies.length === 0) {
-                alert('جميع الشركات المحددة مضافة بالفعل');
-                return;
-            }
-
-            // إضافة الشركات الجديدة
-            if (!db.weeklyPlan[currentAdminDay]) db.weeklyPlan[currentAdminDay] = [];
-            db.weeklyPlan[currentAdminDay] = [...db.weeklyPlan[currentAdminDay], ...newCompanies];
-
-            localStorage.setItem('PHYSIO_V50', JSON.stringify(db));
-            renderAdminCompanyList();
-            renderMultiSelectCompanies();
-            refresh();
+            document.getElementById('global-income').innerText = globalTotal.toLocaleString() + ' ج.م';
+            gsap.to(".node-item", { opacity: 1, x: 0, stagger: 0.1, duration: 0.8, ease: "expo.out" });
+            lucide.createIcons();
         }
 
-        function removeCompanyFromDay(companyName) {
-            db.weeklyPlan[currentAdminDay] = db.weeklyPlan[currentAdminDay].filter(n => n !== companyName);
-            localStorage.setItem('PHYSIO_V50', JSON.stringify(db));
-            renderAdminCompanyList();
-            renderMultiSelectCompanies();
-            refresh();
+        function openPanel(id) {
+            activeId = id;
+            const item = items.find(i => i.id === id);
+            document.getElementById('p-name').innerText = item.name;
+            document.getElementById('p-id').innerText = `NODE: #${item.id.toString().slice(-6)}`;
+            document.getElementById('p-icon').style.background = item.color;
+            
+            updatePanel();
+            renderCalendar(item);
+            
+            const p = document.getElementById('panel');
+            p.style.display = 'flex';
+            gsap.fromTo(p, { y: '100%' }, { y: 0, duration: 0.8, ease: "expo.out" });
         }
 
-        // دوال أخرى
-        function closeModal() { document.getElementById('details-modal').style.display = 'none'; }
-        function moveMonth(n) { viewM.setMonth(viewM.getMonth()+n); refresh(); }
-        function tab(id, el) { 
-            document.querySelectorAll('.page').forEach(p => p.classList.remove('active')); 
-            document.getElementById(id).classList.add('active'); 
-            document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active')); 
-            el.classList.add('active'); 
-        }
-        function checkNewZone(sel) { if(sel.value === "NEW") { const n = prompt("اسم المنطقة الجديدة:"); if(n) { db.zones.push(n); refresh(); sel.value = n; } else sel.selectedIndex = 0; } }
-        function toggleDrop() { document.getElementById("reportDrop").classList.toggle("show"); }
-        function exportData() {
-            try {
-                const blob = new Blob([JSON.stringify(db)], {type:"application/json"}); 
-                const a = document.createElement('a'); 
-                a.href = URL.createObjectURL(blob); 
-                a.download = `Physio_Backup_${new Date().toLocaleDateString()}.json`; 
-                a.click();
-                showToast('تم تصدير البيانات بنجاح', 'success');
-            } catch(err) {
-                console.log("[v0] Export Data Error:", err);
-                alert("حدث خطأ أثناء تصدير البيانات");
-            }
-        }
-        
-        function importData(e) {
-            try {
-                const file = e.target.files[0];
-                if (!file) return;
-                
-                const r = new FileReader(); 
-                r.onload = ev => { 
-                    try {
-                        const importedData = JSON.parse(ev.target.result);
-                        if (!importedData.visits || !importedData.companies) {
-                            throw new Error("صيغة الملف غير صحيحة");
-                        }
-                        
-                        db = importedData;
-                        db.companies = (db.companies || []).map(c => { 
-                            if (!c.plannedDays) c.plannedDays = []; 
-                            if (!c.notes) c.notes = ""; 
-                            if (!c.persons) c.persons = []; 
-                            if (!c.products) c.products = []; 
-                            if (!c.zone) c.zone = "غير محدد";
-                            return c; 
-                        });
-                        if (!db.weeklyPlan) db.weeklyPlan = [[], [], [], [], []];
-                        if (!db.zones) db.zones = ["المعادي", "الدقي", "مدينة نصر", "المقطم", "حلوان", "العبور"];
-                        
-                        cleanWeeklyPlan(); // تنظيف البيانات بعد الاستيراد
-                        localStorage.setItem('PHYSIO_V50', JSON.stringify(db));
-                        refresh(); 
-                        showToast('تم استيراد البيانات بنجاح', 'success'); 
-                    } catch(err) {
-                        console.log("[v0] Import Parse Error:", err);
-                        alert("خطأ في صيغة الملف. تأكد من أنك تستخدم ملف نسخة احتياطية صحيح."); 
-                    }
-                }; 
-                r.readAsText(file); 
-            } catch(err) {
-                console.log("[v0] Import Data Error:", err);
-                alert("حدث خطأ أثناء استيراد البيانات");
-            }
-        }
-
-        // ===== دوال المنتجات والعروض V60 =====
-        function renderEditProducts(products) {
-            const container = document.getElementById('edit-products-container');
-            if (!container) return;
-            container.innerHTML = (products || []).map((p, i) => 
-                `<span class="product-tag">${p}<button onclick="removeProductFromEdit(${i})" title="حذف">×</button></span>`
-            ).join('');
-        }
-
-        function addProductToEdit() {
-            try {
-                const input = document.getElementById('edit-product-input');
-                const val = input.value.trim();
-                if (!val) return alert('يرجى إدخال اسم المنتج أو العرض');
-                if (val.length > 50) return alert('اسم المنتج طويل جداً');
-                
-                const name = document.getElementById('edit-original-name').value;
-                const c = db.companies.find(co => co.name === name);
-                if (!c) return alert('خطأ: لم يتم العثور على الشركة');
-                
-                if (!c.products) c.products = [];
-                if (c.products.includes(val)) return alert('هذا المنتج موجود بالفعل');
-                
-                c.products.push(val);
-                localStorage.setItem('PHYSIO_V50', JSON.stringify(db));
-                renderEditProducts(c.products);
-                input.value = '';
-                input.focus();
-            } catch(err) {
-                console.log("[v0] Add Product Error:", err);
-                alert('حدث خطأ أثناء إضافة المنتج');
-            }
-        }
-
-        function removeProductFromEdit(idx) {
-            try {
-                const name = document.getElementById('edit-original-name').value;
-                const c = db.companies.find(co => co.name === name);
-                if (!c) return alert('خطأ: لم يتم العثور على الشركة');
-                if (!c.products) return;
-                
-                c.products.splice(idx, 1);
-                localStorage.setItem('PHYSIO_V50', JSON.stringify(db));
-                renderEditProducts(c.products);
-            } catch(err) {
-                console.log("[v0] Remove Product Error:", err);
-                alert('حدث خطأ أثناء حذف المنتج');
-            }
-        }
-
-        // ===== صفحة التقارير V60 =====
-        function renderReportsPage() {
-            renderWeekComparison();
-            renderTopCompanies();
-            renderUnvisitedCompanies();
-            renderZonesReport();
-        }
-
-        function getWeekBounds(offsetWeeks) {
+        function renderCalendar(item) {
+            const body = document.getElementById('calendar-body');
+            body.innerHTML = '';
             const now = new Date();
-            const day = now.getDay();
-            // بداية الأسبوع = الأحد
-            const startOfWeek = new Date(now);
-            startOfWeek.setDate(now.getDate() - day - (offsetWeeks * 7));
-            startOfWeek.setHours(0, 0, 0, 0);
-            const endOfWeek = new Date(startOfWeek);
-            endOfWeek.setDate(startOfWeek.getDate() + 6);
-            endOfWeek.setHours(23, 59, 59, 999);
-            return { start: startOfWeek, end: endOfWeek };
-        }
+            const year = now.getFullYear();
+            const month = now.getMonth();
+            
+            document.getElementById('cal-month-year').innerText = now.toLocaleDateString('ar-EG', { month: 'long', year: 'numeric' });
 
-        function getVisitsInRange(start, end) {
-            return db.visits.filter(v => {
-                const d = new Date(v.date);
-                return d >= start && d <= end;
+            const firstDay = new Date(year, month, 1).getDay();
+            const daysInMonth = new Date(year, month + 1, 0).getDate();
+
+            // Booked days extraction
+            const bookedDays = new Set();
+            item.bookings.forEach(b => {
+                const start = new Date(b.date);
+                const end = new Date(b.endDate || b.date);
+                for (let d = new Date(start); d <= end; d.setDate(d.getDate() + 1)) {
+                    if(d.getMonth() === month && d.getFullYear() === year) {
+                        bookedDays.add(d.getDate());
+                    }
+                }
             });
+
+            for(let i = 0; i < firstDay; i++) {
+                body.innerHTML += `<div></div>`;
+            }
+
+            for(let d = 1; d <= daysInMonth; d++) {
+                const isBooked = bookedDays.has(d);
+                body.innerHTML += `
+                    <div class="calendar-day ${isBooked ? 'day-booked' : 'day-empty'}">
+                        ${d}
+                    </div>
+                `;
+            }
         }
 
-        function renderWeekComparison() {
-            const thisWeek = getWeekBounds(0);
-            const lastWeek = getWeekBounds(1);
-            const thisVisits = getVisitsInRange(thisWeek.start, thisWeek.end);
-            const lastVisits = getVisitsInRange(lastWeek.start, lastWeek.end);
+        function updatePanel() {
+            const item = items.find(i => i.id === activeId);
+            const inc = item.bookings.reduce((s, b) => s + b.amount, 0);
+            const exp = item.expenses.reduce((s, e) => s + e.amount, 0);
 
-            const thisCnt = thisVisits.length;
-            const lastCnt = lastVisits.length;
-            const diff = thisCnt - lastCnt;
-            const pct = lastCnt > 0 ? Math.round((diff / lastCnt) * 100) : (thisCnt > 0 ? 100 : 0);
-            const changeClass = diff > 0 ? 'up' : diff < 0 ? 'down' : 'same';
-            const changeIcon = diff > 0 ? '▲' : diff < 0 ? '▼' : '—';
+            document.getElementById('stat-income').innerText = inc.toLocaleString() + ' ج.م';
+            document.getElementById('stat-costs').innerText = exp.toLocaleString() + ' ج.م';
+            document.getElementById('stat-net').innerText = (inc - exp).toLocaleString() + ' ج.م';
 
-            const thisComps = new Set(thisVisits.map(v => v.company)).size;
-            const lastComps = new Set(lastVisits.map(v => v.company)).size;
+            // Bookings Table
+            const bT = document.getElementById('table-bookings');
+            bT.innerHTML = item.bookings.length ? item.bookings.map(b => `
+                <tr class="group hover:bg-slate-50 transition-colors border-b border-slate-50">
+                    <td class="py-5">
+                        <p class="font-black text-slate-800 text-sm">${b.guest}</p>
+                        <p class="text-[10px] text-slate-400 font-bold">${b.date} ➔ ${b.endDate || b.date}</p>
+                    </td>
+                    <td class="py-5 font-black text-indigo-600 text-left text-base">${b.amount.toLocaleString()} ج.م</td>
+                    <td class="py-5 pl-4 text-left">
+                        <button onclick="deleteEntry('bookings', ${b.id})" class="opacity-0 group-hover:opacity-100 text-slate-300 hover:text-rose-500 transition-all"><i data-lucide="trash-2" size="16"></i></button>
+                    </td>
+                </tr>
+            `).join('') : `<tr><td class="py-20 text-center text-slate-300 font-black">لا توجد سجلات حجوزات</td></tr>`;
 
-            document.getElementById('week-compare-grid').innerHTML = `
-                <div class="week-box current">
-                    <div class="week-box-num">${thisCnt}</div>
-                    <div class="week-box-lbl">زيارات هذا الأسبوع</div>
-                    <div class="week-change ${changeClass}">${changeIcon} ${Math.abs(pct)}% ${diff >= 0 ? 'نمو' : 'انخفاض'}</div>
+            // Tenants List
+            const tL = document.getElementById('list-tenants');
+            if(!item.tenants) item.tenants = [];
+            tL.innerHTML = item.tenants.length ? item.tenants.map(t => `
+                <div class="tenant-card">
+                    <div class="flex justify-between items-start">
+                        <div class="flex items-start gap-4">
+                            <div class="w-12 h-12 bg-indigo-100 rounded-2xl flex items-center justify-center text-indigo-600"><i data-lucide="user" size="24"></i></div>
+                            <div>
+                                <p class="font-black text-slate-800 text-sm">${t.name}</p>
+                                <p class="text-[10px] text-slate-400">الهوية: ${t.id}</p>
+                                <p class="text-[10px] text-slate-400">الهاتف: ${t.phone}</p>
+                                <p class="text-[10px] text-slate-400">${t.email}</p>
+                            </div>
+                        </div>
+                        <button onclick="deleteTenant(${t.tenantId})" class="text-slate-300 hover:text-rose-500 transition-all"><i data-lucide="trash-2" size="16"></i></button>
+                    </div>
                 </div>
-                <div class="week-box">
-                    <div class="week-box-num">${lastCnt}</div>
-                    <div class="week-box-lbl">زيارات الأسبوع الماضي</div>
-                    <div class="week-change same">عملاء: ${thisComps} ← ${lastComps}</div>
+            `).join('') : `<p class="py-20 text-center text-slate-300 font-black">لا يوجد مستأجرين مسجلين</p>`;
+
+            // Invoices List
+            const iL = document.getElementById('list-invoices');
+            if(!item.invoices) item.invoices = [];
+            iL.innerHTML = item.invoices.length ? item.invoices.map(inv => `
+                <div class="invoice-item ${inv.status === 'مدفوع' ? 'paid' : 'pending'}">
+                    <div class="flex-1">
+                        <p class="font-black text-slate-800 text-sm">${inv.guestName}</p>
+                        <p class="text-[10px] text-slate-400">${inv.date}</p>
+                    </div>
+                    <div class="flex items-center gap-6">
+                        <div class="text-left">
+                            <p class="font-black text-lg">${inv.amount.toLocaleString()} ج.م</p>
+                            <span class="text-[10px] font-black ${inv.status === 'مدفوع' ? 'text-emerald-600' : 'text-amber-600'}">${inv.status}</span>
+                        </div>
+                        ${inv.status === 'معلق' ? `<button onclick="markInvoicePaid(${inv.id})" class="bg-indigo-600 text-white px-4 py-2 rounded-2xl text-[10px] font-black hover:bg-indigo-700 transition-all">تأكيد الدفع</button>` : ''}
+                    </div>
+                </div>
+            `).join('') : `<p class="py-20 text-center text-slate-300 font-black">لا توجد فواتير</p>`;
+
+            // Expenses List
+            const eL = document.getElementById('list-expenses');
+            eL.innerHTML = item.expenses.length ? item.expenses.map(e => `
+                <div class="p-5 bg-slate-50 rounded-[28px] flex justify-between items-center group">
+                    <div class="flex items-center gap-4">
+                        <div class="w-10 h-10 bg-white rounded-2xl flex items-center justify-center text-rose-500 shadow-sm"><i data-lucide="tag" size="18"></i></div>
+                        <div>
+                            <p class="font-black text-slate-800 text-xs">${e.title}</p>
+                            <p class="text-[9px] text-slate-400 font-bold uppercase">${e.date}</p>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-6">
+                        <span class="font-black text-rose-500 text-sm">${e.amount.toLocaleString()} ج.م</span>
+                        <button onclick="deleteEntry('expenses', ${e.id})" class="opacity-0 group-hover:opacity-100 text-slate-300 hover:text-rose-500"><i data-lucide="trash-2" size="14"></i></button>
+                    </div>
+                </div>
+            `).join('') : `<p class="py-20 text-center text-slate-300 font-black">لا توجد مصروفات مسجلة</p>`;
+            
+            lucide.createIcons();
+        }
+
+        // Modals Logic
+        function addUnitPrompt() {
+            showModal("إضافة وحدة جديدة", [
+                { id: 'u-name', label: 'اسم العقار / الوحدة', type: 'text', placeholder: 'مثال: فيلا الياسمين' }
+            ], 'ADD_UNIT');
+        }
+
+        function showBookingForm() {
+            showModal("حجز جديد", [
+                { id: 'b-guest', label: 'اسم العميل', type: 'text', placeholder: 'الاسم الكامل' },
+                { id: 'b-start', label: 'تاريخ البداية', type: 'date', placeholder: '' },
+                { id: 'b-end', label: 'تاريخ النهاية', type: 'date', placeholder: '' },
+                { id: 'b-amount', label: 'إجمالي المبلغ', type: 'number', placeholder: '0.00' }
+            ], 'ADD_BOOK');
+        }
+
+        function addExpensePrompt() {
+            showModal("تسجيل مصروف", [
+                { id: 'e-title', label: 'البيان', type: 'text', placeholder: 'صيانة، كهرباء، الخ' },
+                { id: 'e-amount', label: 'المبلغ', type: 'number', placeholder: '0.00' }
+            ], 'ADD_EXP');
+        }
+
+        function showTenantForm() {
+            showModal("إضافة مستأجر جديد", [
+                { id: 't-name', label: 'الاسم الكامل', type: 'text', placeholder: 'أحمد محمد' },
+                { id: 't-phone', label: 'رقم الهاتف', type: 'tel', placeholder: '+966501234567' },
+                { id: 't-email', label: 'البريد الإلكتروني', type: 'email', placeholder: 'example@email.com' },
+                { id: 't-id', label: 'رقم الهوية/الجواز', type: 'text', placeholder: '1234567890' }
+            ], 'ADD_TENANT');
+        }
+
+        function createInvoice() {
+            const item = items.find(i => i.id === activeId);
+            const bookingId = prompt('ادخل رقم الحجز (آخر 4 أرقام من رقم الحجز):');
+            if(!bookingId) return;
+            
+            const booking = item.bookings.find(b => b.id.toString().slice(-4) === bookingId);
+            if(!booking) {
+                showNotification('الحجز غير موجود', 'error');
+                return;
+            }
+
+            if(!item.invoices) item.invoices = [];
+            item.invoices.push({
+                id: Date.now(),
+                bookingId: booking.id,
+                amount: booking.amount,
+                date: new Date().toLocaleDateString('ar-EG'),
+                status: 'معلق',
+                guestName: booking.guest
+            });
+            save();
+            updatePanel();
+            showNotification('تم إنشاء الفاتورة بنجاح', 'success');
+        }
+
+        function markInvoicePaid(invoiceId) {
+            const item = items.find(i => i.id === activeId);
+            const invoice = item.invoices.find(inv => inv.id === invoiceId);
+            if(invoice) {
+                invoice.status = 'مدفوع';
+                invoice.paidDate = new Date().toLocaleDateString('ar-EG');
+                save();
+                updatePanel();
+                showNotification('تم تحديث حالة الفاتورة', 'success');
+            }
+        }
+
+        function showModal(title, fields, action) {
+            currentAction = action;
+            document.getElementById('modal-title').innerText = title;
+            const body = document.getElementById('modal-body');
+            body.innerHTML = fields.map(f => `
+                <div>
+                    <label class="block text-[10px] font-black text-slate-400 uppercase mb-3 mr-2 tracking-widest">${f.label}</label>
+                    <input type="${f.type}" id="${f.id}" placeholder="${f.placeholder}" class="w-full bg-slate-50 border border-slate-100 rounded-2xl p-5 outline-none focus:border-indigo-500 font-bold text-slate-800 transition-all">
+                </div>
+            `).join('');
+            const m = document.getElementById('modal');
+            m.style.display = 'flex';
+            gsap.fromTo(m.children[0], { scale: 0.9, opacity: 0 }, { scale: 1, opacity: 1, duration: 0.4, ease: "back.out" });
+        }
+
+        function executeAction() {
+            const item = items.find(i => i.id === activeId);
+            if(currentAction === 'ADD_UNIT') {
+                const name = document.getElementById('u-name').value;
+                if(!name) return;
+                items.push({ 
+                    id: Date.now(), 
+                    name, 
+                    color: gradients[items.length % gradients.length], 
+                    bookings: [], 
+                    expenses: [],
+                    tenants: [],
+                    invoices: []
+                });
+                showNotification('تم إضافة الوحدة بنجاح', 'success');
+            } else if(currentAction === 'ADD_BOOK') {
+                const guest = document.getElementById('b-guest').value;
+                const start = document.getElementById('b-start').value;
+                const end = document.getElementById('b-end').value;
+                const amount = parseFloat(document.getElementById('b-amount').value);
+                if(!guest || !amount || !start) return;
+                item.bookings.push({ id: Date.now(), guest, amount, date: start, endDate: end });
+                showNotification('تم إضافة الحجز بنجاح', 'success');
+            } else if(currentAction === 'ADD_EXP') {
+                const title = document.getElementById('e-title').value;
+                const amount = parseFloat(document.getElementById('e-amount').value);
+                if(!title || !amount) return;
+                item.expenses.push({ id: Date.now(), title, amount, date: new Date().toLocaleDateString('ar-EG') });
+                showNotification('تم تسجيل المصروف بنجاح', 'success');
+            } else if(currentAction === 'ADD_TENANT') {
+                const name = document.getElementById('t-name').value;
+                const phone = document.getElementById('t-phone').value;
+                const email = document.getElementById('t-email').value;
+                const id = document.getElementById('t-id').value;
+                if(!name || !phone || !email) return;
+                if(!item.tenants) item.tenants = [];
+                item.tenants.push({ 
+                    tenantId: Date.now(),
+                    name, 
+                    phone, 
+                    email, 
+                    id,
+                    dateAdded: new Date().toLocaleDateString('ar-EG')
+                });
+                showNotification('تم إضافة المستأجر بنجاح', 'success');
+            }
+            save();
+            renderWorkspace();
+            if(activeId) {
+                updatePanel();
+                renderCalendar(items.find(i => i.id === activeId));
+            }
+            closeModal();
+        }
+
+        function save() { localStorage.setItem('studioflow_v5', JSON.stringify(items)); }
+        function closeModal() { document.getElementById('modal').style.display = 'none'; }
+        function closePanel() { gsap.to("#panel", { y: '100%', duration: 0.6, onComplete: () => document.getElementById('panel').style.display = 'none' }); activeId = null; }
+        function deleteUnit(id) { items = items.filter(i => i.id !== id); save(); renderWorkspace(); }
+        function deleteEntry(type, eid) { const item = items.find(i => i.id === activeId); item[type] = item[type].filter(x => x.id !== eid); save(); updatePanel(); renderCalendar(item); }
+
+        function switchTab(tab) {
+            document.getElementById('tab-bookings').classList.toggle('hidden', tab !== 'bookings');
+            document.getElementById('tab-tenants').classList.toggle('hidden', tab !== 'tenants');
+            document.getElementById('tab-invoices').classList.toggle('hidden', tab !== 'invoices');
+            document.getElementById('tab-expenses').classList.toggle('hidden', tab !== 'expenses');
+            
+            document.getElementById('btn-tab-b').classList.toggle('active', tab === 'bookings');
+            document.getElementById('btn-tab-t').classList.toggle('active', tab === 'tenants');
+            document.getElementById('btn-tab-i').classList.toggle('active', tab === 'invoices');
+            document.getElementById('btn-tab-e').classList.toggle('active', tab === 'expenses');
+        }
+
+        function deleteTenant(tenantId) {
+            const item = items.find(i => i.id === activeId);
+            item.tenants = item.tenants.filter(t => t.tenantId !== tenantId);
+            save();
+            updatePanel();
+        }
+
+        function showReports() {
+            const item = items.find(i => i.id === activeId);
+            const inc = item.bookings.reduce((s, b) => s + b.amount, 0);
+            const exp = item.expenses.reduce((s, e) => s + e.amount, 0);
+            const paid = (item.invoices || []).filter(i => i.status === 'مدفوع').reduce((s, i) => s + i.amount, 0);
+            const pending = (item.invoices || []).filter(i => i.status === 'معلق').reduce((s, i) => s + i.amount, 0);
+
+            const content = document.getElementById('reports-content');
+            content.innerHTML = `
+                <div class="grid grid-cols-2 gap-6">
+                    <div class="bg-gradient-to-br from-indigo-50 to-indigo-100 p-6 rounded-2xl">
+                        <p class="text-[10px] font-black text-indigo-600 uppercase">إجمالي الإيرادات</p>
+                        <p class="text-3xl font-black text-indigo-900 mt-2">${inc.toLocaleString()} ج.م</p>
+                    </div>
+                    <div class="bg-gradient-to-br from-rose-50 to-rose-100 p-6 rounded-2xl">
+                        <p class="text-[10px] font-black text-rose-600 uppercase">إجمالي المصروفات</p>
+                        <p class="text-3xl font-black text-rose-900 mt-2">${exp.toLocaleString()} ج.م</p>
+                    </div>
+                    <div class="bg-gradient-to-br from-emerald-50 to-emerald-100 p-6 rounded-2xl">
+                        <p class="text-[10px] font-black text-emerald-600 uppercase">الفواتير المدفوعة</p>
+                        <p class="text-3xl font-black text-emerald-900 mt-2">${paid.toLocaleString()} ج.م</p>
+                    </div>
+                    <div class="bg-gradient-to-br from-amber-50 to-amber-100 p-6 rounded-2xl">
+                        <p class="text-[10px] font-black text-amber-600 uppercase">الفواتير المعلقة</p>
+                        <p class="text-3xl font-black text-amber-900 mt-2">${pending.toLocaleString()} ج.م</p>
+                    </div>
+                </div>
+                <div class="bg-slate-50 p-6 rounded-2xl">
+                    <p class="text-[10px] font-black text-slate-600 uppercase mb-4">ملخص الربح</p>
+                    <p class="text-4xl font-black text-slate-900">${(inc - exp).toLocaleString()} ج.م</p>
+                    <p class="text-[10px] text-slate-400 mt-2">صافي الربح بعد خصم المصروفات</p>
                 </div>
             `;
-
-            // رسم بياني يومي
-            const dayNamesShort = ['أحد','إثن','ثلا','أرب','خمس'];
-            const thisPerDay = [0,0,0,0,0];
-            const lastPerDay = [0,0,0,0,0];
-
-            thisVisits.forEach(v => {
-                const d = new Date(v.date).getDay();
-                if (d < 5) thisPerDay[d]++;
-            });
-            lastVisits.forEach(v => {
-                const d = new Date(v.date).getDay();
-                if (d < 5) lastPerDay[d]++;
-            });
-
-            const maxVal = Math.max(...thisPerDay, ...lastPerDay, 1);
-            const barContainer = document.getElementById('days-bar-chart');
-            barContainer.innerHTML = '';
-
-            dayNamesShort.forEach((name, i) => {
-                const thisH = Math.round((thisPerDay[i] / maxVal) * 65);
-                const lastH = Math.round((lastPerDay[i] / maxVal) * 65);
-                barContainer.innerHTML += `
-                    <div class="day-bar-wrap" style="gap:2px;">
-                        <div class="day-bar-num">${thisPerDay[i]||''}</div>
-                        <div style="display:flex; gap:2px; align-items:flex-end; height:65px;">
-                            <div style="width:10px; background:#e2e8f0; border-radius:4px 4px 0 0; height:${lastH}px; min-height:3px;"></div>
-                            <div style="width:10px; background:var(--teal); border-radius:4px 4px 0 0; height:${thisH}px; min-height:3px;"></div>
-                        </div>
-                        <div class="day-bar-label">${name}</div>
-                    </div>`;
-            });
+            document.getElementById('reports-modal').style.display = 'flex';
         }
 
-        function renderTopCompanies() {
-            const now = new Date();
-            const mVisits = db.visits.filter(v => {
-                const d = new Date(v.date);
-                return d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear();
-            });
-
-            const counts = {};
-            mVisits.forEach(v => { counts[v.company] = (counts[v.company] || 0) + 1; });
-            const sorted = Object.entries(counts).sort((a,b) => b[1]-a[1]).slice(0, 7);
-            const maxCnt = sorted[0]?.[1] || 1;
-            const rankClasses = ['gold', 'silver', 'bronze'];
-
-            if (!sorted.length) {
-                document.getElementById('top-companies-list').innerHTML = '<p style="text-align:center; opacity:0.5;">لا بيانات هذا الشهر</p>';
-                return;
-            }
-
-            document.getElementById('top-companies-list').innerHTML = sorted.map(([name, cnt], i) => {
-                const c = db.companies.find(co => co.name === name) || {};
-                const fillPct = Math.round((cnt / maxCnt) * 100);
-                return `
-                    <div class="top-company-row">
-                        <div class="top-company-rank ${rankClasses[i] || ''}">${i+1}</div>
-                        <div class="top-company-info">
-                            <b style="font-size:13px;">${name}</b>
-                            <small style="color:#888; display:block;">📍 ${c.zone || ''} • ${cnt} زيارة</small>
-                            <div class="top-company-bar"><div class="top-company-fill" style="width:${fillPct}%"></div></div>
-                        </div>
-                        <span style="font-size:20px; font-weight:900; color:var(--teal);">${cnt}</span>
-                    </div>`;
-            }).join('');
+        function closeReports() {
+            document.getElementById('reports-modal').style.display = 'none';
         }
 
-        function renderUnvisitedCompanies() {
-            const now = new Date();
-            const result = db.companies.map(c => {
-                const visits = db.visits.filter(v => v.company === c.name);
-                const lastVisit = visits.length ? new Date(visits[visits.length-1].date) : null;
-                const daysSince = lastVisit ? Math.floor((now - lastVisit) / (1000*60*60*24)) : 9999;
-                return { name: c.name, zone: c.zone, daysSince, lastVisit };
-            }).sort((a,b) => b.daysSince - a.daysSince).slice(0, 10);
-
-            document.getElementById('unvisited-companies-list').innerHTML = result.map(r => {
-                let badgeClass, badgeText;
-                if (r.daysSince >= 30 || r.daysSince === 9999) {
-                    badgeClass = 'danger';
-                    badgeText = r.daysSince === 9999 ? 'لم تُزار أبداً' : `${r.daysSince} يوم`;
-                } else if (r.daysSince >= 14) {
-                    badgeClass = 'warning';
-                    badgeText = `${r.daysSince} يوم`;
-                } else {
-                    badgeClass = 'ok';
-                    badgeText = `${r.daysSince} يوم`;
-                }
-                return `
-                    <div class="unvisited-item">
-                        <div>
-                            <b style="font-size:13px;">${r.name}</b>
-                            <small style="color:#888; display:block;">📍 ${r.zone}</small>
-                        </div>
-                        <span class="unvisited-badge ${badgeClass}">${badgeText}</span>
-                    </div>`;
-            }).join('');
-        }
-
-        function renderZonesReport() {
-            const now = new Date();
-            const mVisits = db.visits.filter(v => {
-                const d = new Date(v.date);
-                return d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear();
-            });
-
-            const zoneCounts = {};
-            mVisits.forEach(v => {
-                const c = db.companies.find(co => co.name === v.company);
-                if (c) zoneCounts[c.zone] = (zoneCounts[c.zone] || 0) + 1;
-            });
-
-            const sorted = Object.entries(zoneCounts).sort((a,b) => b[1]-a[1]);
-            const maxCnt = sorted[0]?.[1] || 1;
-
-            if (!sorted.length) {
-                document.getElementById('zones-report-list').innerHTML = '<p style="text-align:center; opacity:0.5;">لا بيانات هذا الشهر</p>';
-                return;
-            }
-
-            document.getElementById('zones-report-list').innerHTML = sorted.map(([zone, cnt]) => {
-                const fillPct = Math.round((cnt / maxCnt) * 100);
-                return `
-                    <div style="margin-bottom:12px;">
-                        <div style="display:flex; justify-content:space-between; font-size:13px; font-weight:bold; margin-bottom:4px;">
-                            <span>📍 ${zone}</span><span style="color:var(--teal);">${cnt} زيارة</span>
-                        </div>
-                        <div style="height:8px; background:#f0f7fa; border-radius:4px; overflow:hidden;">
-                            <div style="width:${fillPct}%; height:100%; background:var(--teal); border-radius:4px; transition:width 0.8s ease;"></div>
-                        </div>
-                    </div>`;
-            }).join('');
-        }
+        window.onload = init;
     </script>
 </body>
 </html>

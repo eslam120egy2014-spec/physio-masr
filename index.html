@@ -101,9 +101,9 @@
         .days-checkbox-group { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 15px; background: #f9f9f9; padding: 10px; border-radius: 12px; }
         .days-checkbox-group label { display: inline-flex; align-items: center; gap: 5px; font-size: 13px; font-weight: normal; margin-bottom: 0; cursor: pointer; }
         .planned-day-badge { background: var(--teal); color: white; padding: 2px 8px; border-radius: 12px; font-size: 10px; font-weight: bold; margin-left: 5px; }
-        .company-item { cursor: pointer; transition: background 0.15s; touch-action: pan-y; user-select: none; -webkit-user-select: none; -webkit-tap-highlight-color: transparent; }
+        .company-item { cursor: pointer; transition: background 0.15s; touch-action: manipulation; user-select: none; -webkit-user-select: none; -webkit-tap-highlight-color: transparent; }
         .company-item:active { background: #f0f0f0; }
-        .company-item.longpress-active { background: #e8f4f4; transform: scale(0.99); transition: transform 0.1s; }
+        .company-item.longpress-active { background: #e8f4f4; box-shadow: 0 0 0 2px var(--teal); }
 
         /* تنسيقات صفحة التحكم داخل الهب */
         .admin-day-tab { padding: 8px 12px; background: #eee; border-radius: 20px; font-size: 12px; font-weight: bold; cursor: pointer; white-space: nowrap; }
@@ -114,7 +114,7 @@
         .drag-handle { font-size: 20px; color: #aaa; margin-left: 5px; }
 
         /* تحسين التمرير في صفحة البيانات */
-        .company-list-scroll { max-height: 70vh; overflow-y: auto; padding-left: 5px; -webkit-overflow-scrolling: touch; }
+        .company-list-scroll { max-height: 70vh; overflow-y: auto; padding-left: 5px; -webkit-overflow-scrolling: touch; overscroll-behavior: contain; }
 
         /* تنسيق قائمة الاختيار المتعدد في التحكم */
         .multi-select-list { max-height: 250px; overflow-y: auto; border: 1px solid var(--border); border-radius: 12px; padding: 10px; margin: 10px 0; background: #f9f9f9; }
@@ -684,121 +684,128 @@
             tab('p-home', document.querySelectorAll('.nav-link')[0]);
         }
 
-        // عرض الشركات في صفحة البيانات (مع تحسين اللمس)
+        // عرض الشركات في صفحة البيانات
         function renderComps() { 
             const s = document.getElementById('comp-search').value.toLowerCase(); 
             const f = db.companies.filter(c => c.name.toLowerCase().includes(s) || c.zone.toLowerCase().includes(s)); 
             let html = '';
             f.forEach(c => {
                 const daysStr = (c.plannedDays || []).map(d => dayNames[d]).join('، ');
+                const safeName = c.name.replace(/"/g, '&quot;');
                 html += `
-                <div class="card company-item" 
-                     data-name="${c.name.replace(/'/g, "\\'")}"
-                     style="display:flex; justify-content:space-between; align-items:center;">
-                    <div>
-                        <b>${c.name}</b><br>
-                        <small>📍 ${c.zone}</small><br>
-                        ${daysStr ? '<small class="planned-day-badge">🗓️ ' + daysStr + '</small>' : ''}
-                        ${c.notes ? '<br><small>📝 ' + c.notes + '</small>' : ''}
-                        ${c.persons && c.persons.length ? '<br><small>👤 ' + c.persons.map(p => p.name).join(' - ') + '</small>' : ''}
+                <div class="card company-item" data-name="${safeName}">
+                    <div style="display:flex; justify-content:space-between; align-items:center; pointer-events:none;">
+                        <div>
+                            <b>${c.name}</b><br>
+                            <small>📍 ${c.zone}</small><br>
+                            ${daysStr ? '<small class="planned-day-badge">🗓️ ' + daysStr + '</small>' : ''}
+                            ${c.notes ? '<br><small>📝 ' + c.notes + '</small>' : ''}
+                            ${c.persons && c.persons.length ? '<br><small>👤 ' + c.persons.map(p => p.name).join(' - ') + '</small>' : ''}
+                        </div>
+                        <svg style="width:14px; color:var(--teal);" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M15 18l-6-6 6-6" /></svg>
                     </div>
-                    <svg style="width:14px; color:var(--teal);" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M15 18l-6-6 6-6" /></svg>
                 </div>`;
             });
             document.getElementById('company-list').innerHTML = html;
-
-            // إضافة مستمعات اللمس لكل عنصر
-            document.querySelectorAll('.company-item').forEach(item => {
-                const name = item.getAttribute('data-name');
-                attachTouchEvents(item, name);
-            });
+            initCompanyListDelegation();
         }
 
-        // دوال اللمس للتمييز بين النقر والتمرير
-        function attachTouchEvents(element, companyName) {
-            let touchStartTime;
-            let startX, startY;
-            let longPressTriggered = false;
-            let localTimer = null;
-            const LONG_PRESS_DELAY = 600;   // مللي ثانية للضغط المطول
-            const MOVE_THRESHOLD   = 8;     // بكسل - لو تحرك أكثر من ده يتلغى
+        // ===== نظام اللمس بـ Event Delegation =====
+        let _delegationReady = false;
+        function initCompanyListDelegation() {
+            if (_delegationReady) return; // نضيف الـ listeners مرة واحدة بس
+            _delegationReady = true;
+            const container = document.getElementById('company-list');
 
-            function cancelPress() {
-                if (localTimer) { clearTimeout(localTimer); localTimer = null; }
-                element.classList.remove('longpress-active');
+            let touchStartTime, startX, startY;
+            let longPressTimer = null;
+            let longPressTriggered = false;
+            let activeEl = null;
+            const DELAY = 550;
+            const THRESHOLD = 10;
+
+            function getItem(el) {
+                return el.closest('.company-item');
             }
 
-            // ===== اللمس =====
-            element.addEventListener('touchstart', (e) => {
+            function cancelLP() {
+                if (longPressTimer) { clearTimeout(longPressTimer); longPressTimer = null; }
+                if (activeEl) { activeEl.classList.remove('longpress-active'); activeEl = null; }
+            }
+
+            function fireLP(name) {
+                cancelLP();
+                longPressTriggered = true;
+                if (navigator.vibrate) navigator.vibrate(50);
+                openFullEdit(name);
+            }
+
+            // ---- Touch ----
+            container.addEventListener('touchstart', (e) => {
+                const item = getItem(e.target);
+                if (!item) return;
+                const name = item.dataset.name;
                 startX = e.touches[0].clientX;
                 startY = e.touches[0].clientY;
                 touchStartTime = Date.now();
                 longPressTriggered = false;
-
-                localTimer = setTimeout(() => {
-                    longPressTriggered = true;
-                    element.classList.remove('longpress-active');
-                    // اهتزاز خفيف لو الجهاز يدعمه
-                    if (navigator.vibrate) navigator.vibrate(40);
-                    openFullEdit(companyName);
-                }, LONG_PRESS_DELAY);
-                // feedback بصري بعد 150ms
-                setTimeout(() => { if (localTimer) element.classList.add('longpress-active'); }, 150);
+                activeEl = item;
+                longPressTimer = setTimeout(() => fireLP(name), DELAY);
+                // feedback بصري بعد 200ms
+                setTimeout(() => { if (longPressTimer && activeEl) activeEl.classList.add('longpress-active'); }, 200);
             }, { passive: true });
 
-            element.addEventListener('touchmove', (e) => {
-                if (!localTimer) return;
+            container.addEventListener('touchmove', (e) => {
+                if (!longPressTimer) return;
                 const dx = Math.abs(e.touches[0].clientX - startX);
                 const dy = Math.abs(e.touches[0].clientY - startY);
-                // لو السكرول بيبدأ يتلغى الـ long press
-                if (dx > MOVE_THRESHOLD || dy > MOVE_THRESHOLD) {
-                    cancelPress();
-                }
+                if (dx > THRESHOLD || dy > THRESHOLD) cancelLP();
             }, { passive: true });
 
-            element.addEventListener('touchend', (e) => {
-                cancelPress();
-                if (!longPressTriggered && (Date.now() - touchStartTime) < 300) {
-                    showCompDetails(companyName);
+            container.addEventListener('touchend', (e) => {
+                const wasLong = longPressTriggered;
+                cancelLP();
+                if (!wasLong && (Date.now() - touchStartTime) < 400) {
+                    const item = getItem(e.target);
+                    if (item) showCompDetails(item.dataset.name);
                 }
             });
 
-            element.addEventListener('touchcancel', cancelPress);
+            container.addEventListener('touchcancel', cancelLP);
 
-            // ===== الماوس (للاختبار على الكمبيوتر) =====
-            element.addEventListener('mousedown', (e) => {
-                if (e.button !== 0) return; // كليك يسار فقط
-                startX = e.clientX;
-                startY = e.clientY;
+            // ---- Mouse (desktop) ----
+            container.addEventListener('mousedown', (e) => {
+                if (e.button !== 0) return;
+                const item = getItem(e.target);
+                if (!item) return;
+                const name = item.dataset.name;
+                startX = e.clientX; startY = e.clientY;
                 touchStartTime = Date.now();
                 longPressTriggered = false;
-
-                localTimer = setTimeout(() => {
-                    longPressTriggered = true;
-                    openFullEdit(companyName);
-                }, LONG_PRESS_DELAY);
+                activeEl = item;
+                longPressTimer = setTimeout(() => fireLP(name), DELAY);
+                setTimeout(() => { if (longPressTimer && activeEl) activeEl.classList.add('longpress-active'); }, 200);
             });
 
-            element.addEventListener('mousemove', (e) => {
-                if (!localTimer) return;
-                const dx = Math.abs(e.clientX - startX);
-                const dy = Math.abs(e.clientY - startY);
-                // threshold أكبر للماوس عشان مش دايماً الإيد ثابتة
-                if (dx > 5 || dy > 5) cancelPress();
+            container.addEventListener('mousemove', (e) => {
+                if (!longPressTimer) return;
+                if (Math.abs(e.clientX - startX) > 5 || Math.abs(e.clientY - startY) > 5) cancelLP();
             });
 
-            element.addEventListener('mouseup', (e) => {
-                cancelPress();
-                if (!longPressTriggered && (Date.now() - touchStartTime) < 300) {
-                    showCompDetails(companyName);
+            container.addEventListener('mouseup', (e) => {
+                const wasLong = longPressTriggered;
+                cancelLP();
+                if (!wasLong && (Date.now() - touchStartTime) < 300) {
+                    const item = getItem(e.target);
+                    if (item) showCompDetails(item.dataset.name);
                 }
             });
 
-            element.addEventListener('mouseleave', cancelPress);
-
-            // منع القائمة السياقية على الموبايل
-            element.addEventListener('contextmenu', (e) => e.preventDefault());
+            container.addEventListener('mouseleave', cancelLP);
+            container.addEventListener('contextmenu', (e) => e.preventDefault());
         }
+
+        // (attachTouchEvents محذوفة - تم استبدالها بـ event delegation في initCompanyListDelegation)
 
         // (دوال قديمة محذوفة - تم الاستعاضة عنها بـ attachTouchEvents)
 
@@ -934,7 +941,25 @@
             } 
         }
 
-        function renderVisits() { const f = db.visits.filter(v => v.date === selD); document.getElementById('daily-visits').innerHTML = f.map(v => `<div class="card" style="border-right:5px solid var(--teal)"><b>${v.company}</b><br><small>${v.note}</small></div>`).join('') || '<p style="text-align:center; opacity:0.5;">لا زيارات اليوم</p>'; }
+        function renderVisits() { 
+            const f = db.visits.filter(v => v.date === selD); 
+            document.getElementById('daily-visits').innerHTML = f.length ? f.map((v, idx) => {
+                const globalIdx = db.visits.findIndex(x => x === v);
+                return `<div class="card" style="border-right:5px solid var(--teal);">
+                    <div style="display:flex; justify-content:space-between; align-items:flex-start;">
+                        <div><b>${v.company}</b><br><small>${v.note}</small>${v.timestamp ? '<br><small style="color:#aaa;">⏰ ' + v.timestamp + '</small>' : ''}</div>
+                        <button class="delete-btn small" onclick="deleteVisit(${globalIdx})" style="margin-right:5px; flex-shrink:0;">حذف</button>
+                    </div>
+                </div>`;
+            }).join('') : '<p style="text-align:center; opacity:0.5;">لا زيارات اليوم</p>'; 
+        }
+
+        function deleteVisit(idx) {
+            if (confirm('هل تريد حذف هذه الزيارة؟')) {
+                db.visits.splice(idx, 1);
+                refresh();
+            }
+        }
         
         function showCompDetails(name) { 
             const c = db.companies.find(co => co.name === name); 
